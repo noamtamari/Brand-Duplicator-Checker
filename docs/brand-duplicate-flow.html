@@ -1,0 +1,1809 @@
+<title>Brand Duplicate Check Flow</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chivo:wght@600;700;800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Hebrew:wght@400;600&display=swap">
+
+<style>
+:root{
+  --ground:#EEF1F3;
+  --surface:#FFFFFF;
+  --surface-2:#F5F8F9;
+  --surface-3:#EAEFF2;
+  --ink:#12202A;
+  --ink-2:#3D4F5C;
+  --muted:#697C89;
+  --line:#D6DEE3;
+  --line-strong:#B6C4CD;
+  --accent:#0E6273;
+  --accent-ink:#0A4C5A;
+  --accent-soft:#DBEAEE;
+  --block:#B3261E;
+  --block-soft:#FAE3E1;
+  --block-line:#E9B4AF;
+  --review:#A05800;
+  --review-soft:#FBEAD3;
+  --review-line:#E7C48E;
+  --allow:#1B6E47;
+  --allow-soft:#DBEEE3;
+  --allow-line:#A6D2BB;
+  --shadow:0 1px 2px rgba(18,32,42,.06), 0 6px 18px -10px rgba(18,32,42,.28);
+  --shadow-lg:0 2px 4px rgba(18,32,42,.05), 0 18px 40px -20px rgba(18,32,42,.35);
+  --radius:10px;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"IBM Plex Sans","IBM Plex Sans Hebrew",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --display:"Chivo","IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ground:#0D1317;
+    --surface:#141D23;
+    --surface-2:#1A242B;
+    --surface-3:#212E36;
+    --ink:#E3EBEF;
+    --ink-2:#B0C1CB;
+    --muted:#7D919D;
+    --line:#26343E;
+    --line-strong:#374B58;
+    --accent:#4FBCD0;
+    --accent-ink:#7FD3E3;
+    --accent-soft:#0F3039;
+    --block:#F08A81;
+    --block-soft:#37150F;
+    --block-line:#6A2B22;
+    --review:#E3AB63;
+    --review-soft:#34240E;
+    --review-line:#6A4A1C;
+    --allow:#5DC08C;
+    --allow-soft:#0F2E1E;
+    --allow-line:#255E3F;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
+    --shadow-lg:0 2px 4px rgba(0,0,0,.4), 0 18px 40px -20px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0D1317;
+  --surface:#141D23;
+  --surface-2:#1A242B;
+  --surface-3:#212E36;
+  --ink:#E3EBEF;
+  --ink-2:#B0C1CB;
+  --muted:#7D919D;
+  --line:#26343E;
+  --line-strong:#374B58;
+  --accent:#4FBCD0;
+  --accent-ink:#7FD3E3;
+  --accent-soft:#0F3039;
+  --block:#F08A81;
+  --block-soft:#37150F;
+  --block-line:#6A2B22;
+  --review:#E3AB63;
+  --review-soft:#34240E;
+  --review-line:#6A4A1C;
+  --allow:#5DC08C;
+  --allow-soft:#0F2E1E;
+  --allow-line:#255E3F;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 6px 18px -10px rgba(0,0,0,.7);
+  --shadow-lg:0 2px 4px rgba(0,0,0,.4), 0 18px 40px -20px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:15px;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- top bar ---------- */
+.topbar{
+  position:sticky;
+  top:env(safe-area-inset-top,0px);
+  z-index:40;
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.topbar-inner{
+  max-width:1200px;margin:0 auto;
+  padding:10px 20px;
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+}
+.mark{
+  font-family:var(--display);font-weight:800;font-size:13px;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);
+  white-space:nowrap;
+}
+.navlinks{display:flex;gap:2px;flex-wrap:wrap;margin-left:auto}
+.navlinks a{
+  font-size:12.5px;color:var(--ink-2);text-decoration:none;
+  padding:5px 9px;border-radius:6px;white-space:nowrap;
+}
+.navlinks a:hover{background:var(--surface-3);color:var(--ink)}
+.navlinks a:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* ---------- shell ---------- */
+.wrap{max-width:1200px;margin:0 auto;padding-inline:20px;padding-block:0 96px}
+
+.hero{padding-block:44px 30px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:var(--mono);font-size:11.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--accent);
+  margin:0 0 12px;
+}
+h1{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(30px,5.2vw,46px);line-height:1.04;
+  letter-spacing:-.022em;margin:0 0 16px;text-wrap:balance;
+}
+.lede{font-size:17px;color:var(--ink-2);max-width:68ch;margin:0 0 24px}
+.lede strong{color:var(--ink);font-weight:600}
+
+.factbar{
+  display:grid;gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:var(--radius);
+  overflow:hidden;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+}
+.fact{background:var(--surface);padding:13px 15px}
+.fact dt{
+  font-family:var(--mono);font-size:10.5px;font-weight:500;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin:0 0 5px;
+}
+.fact dd{margin:0;font-size:13.5px;font-weight:500;line-height:1.4}
+.fact dd code{font-size:12.5px}
+
+section{padding-block:52px 0;scroll-margin-top:70px}
+h2{
+  font-family:var(--display);font-weight:700;
+  font-size:clamp(21px,3vw,28px);letter-spacing:-.015em;
+  margin:0 0 6px;text-wrap:balance;
+}
+h3{
+  font-family:var(--display);font-weight:700;font-size:16.5px;
+  letter-spacing:-.008em;margin:32px 0 12px;
+}
+.sec-note{color:var(--muted);font-size:14px;margin:0 0 26px;max-width:72ch}
+p{max-width:72ch}
+
+code,.mono{font-family:var(--mono);font-size:.875em}
+code{
+  background:var(--surface-3);padding:1.5px 5px;border-radius:4px;
+  color:var(--accent-ink);white-space:nowrap;
+}
+.he{font-family:"IBM Plex Sans Hebrew",var(--sans);direction:rtl;unicode-bidi:isolate}
+
+/* ---------- badges ---------- */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.07em;text-transform:uppercase;
+  padding:2.5px 7px;border-radius:5px;border:1px solid;white-space:nowrap;
+  vertical-align:middle;
+}
+.b-block{background:var(--block-soft);color:var(--block);border-color:var(--block-line)}
+.b-review{background:var(--review-soft);color:var(--review);border-color:var(--review-line)}
+.b-allow{background:var(--allow-soft);color:var(--allow);border-color:var(--allow-line)}
+.b-impl{background:var(--accent-soft);color:var(--accent-ink);border-color:color-mix(in srgb,var(--accent) 35%,transparent)}
+.b-inferred{background:transparent;color:var(--muted);border-color:var(--line-strong);border-style:dashed}
+.b-not{background:var(--surface-3);color:var(--muted);border-color:var(--line-strong)}
+
+.legend{
+  display:flex;gap:10px;flex-wrap:wrap;align-items:center;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:13px 16px;margin:0 0 8px;
+}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink-2)}
+
+/* ---------- outcome cards ---------- */
+.outcomes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));margin-top:22px}
+.outcome{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px;
+  border-top:3px solid var(--line-strong);box-shadow:var(--shadow);
+}
+.outcome.o-block{border-top-color:var(--block)}
+.outcome.o-review{border-top-color:var(--review)}
+.outcome.o-allow{border-top-color:var(--allow)}
+.outcome-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:9px}
+.outcome-name{font-family:var(--display);font-weight:700;font-size:19px;letter-spacing:-.01em}
+.o-block .outcome-name{color:var(--block)}
+.o-review .outcome-name{color:var(--review)}
+.o-allow .outcome-name{color:var(--allow)}
+.outcome-api{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.outcome p{font-size:13.5px;color:var(--ink-2);margin:0 0 12px}
+.outcome ul{margin:0;padding-left:17px;font-size:12.5px;color:var(--muted);line-height:1.75}
+.outcome li::marker{color:var(--line-strong)}
+
+/* ---------- spine ---------- */
+.spine{margin-top:26px;display:flex;flex-direction:column;gap:0}
+.spine-step{display:grid;grid-template-columns:52px 1fr;gap:16px;align-items:stretch}
+.spine-rail{display:flex;flex-direction:column;align-items:center}
+.spine-num{
+  width:31px;height:31px;flex:none;border-radius:50%;
+  background:var(--surface);border:1.5px solid var(--line-strong);
+  display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent-ink);
+}
+.spine-line{width:1.5px;flex:1;background:var(--line-strong);min-height:18px}
+.spine-step:last-child .spine-line{background:transparent}
+.spine-body{padding-bottom:18px;min-width:0}
+.spine-title{font-family:var(--display);font-weight:700;font-size:15.5px;margin:4px 0 5px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.spine-body p{font-size:13.5px;color:var(--ink-2);margin:0 0 7px}
+.spine-src{font-family:var(--mono);font-size:11.5px;color:var(--muted);word-break:break-word}
+.spine-src b{color:var(--accent-ink);font-weight:500}
+
+/* ---------- stage cards ---------- */
+.stages{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));margin-top:24px}
+.stage{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:0;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--shadow);
+}
+.stage-head{
+  padding:14px 16px 12px;border-bottom:1px solid var(--line);background:var(--surface-2);
+}
+.stage-idx{
+  font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.12em;
+  color:var(--accent);text-transform:uppercase;display:block;margin-bottom:5px;
+}
+.stage-name{font-family:var(--display);font-weight:700;font-size:15.5px;margin:0;letter-spacing:-.01em}
+.stage-purpose{font-size:13px;color:var(--ink-2);margin:7px 0 0}
+.stage-body{padding:13px 16px 15px;display:flex;flex-direction:column;gap:9px;flex:1}
+.io{display:grid;grid-template-columns:52px 1fr;gap:9px;font-size:12.5px;align-items:start}
+.io-k{
+  font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--muted);padding-top:2px;
+}
+.io-v{color:var(--ink-2);min-width:0;word-break:break-word}
+.stage-foot{
+  margin-top:auto;padding-top:11px;border-top:1px dashed var(--line);
+  font-family:var(--mono);font-size:11px;color:var(--muted);
+  display:flex;flex-direction:column;gap:3px;word-break:break-word;
+}
+.stage-foot b{color:var(--accent-ink);font-weight:500}
+.thresholds{display:flex;gap:5px;flex-wrap:wrap;margin-top:3px}
+.thr{
+  font-family:var(--mono);font-size:10.5px;font-weight:500;
+  background:var(--accent-soft);color:var(--accent-ink);
+  border:1px solid color-mix(in srgb,var(--accent) 25%,transparent);
+  padding:2px 6px;border-radius:4px;cursor:help;position:relative;
+}
+.thr:hover::after,.thr:focus-visible::after{
+  content:attr(data-tip);position:absolute;bottom:calc(100% + 7px);left:0;
+  background:var(--ink);color:var(--ground);font-family:var(--sans);
+  font-size:11.5px;font-weight:400;line-height:1.45;letter-spacing:0;
+  text-transform:none;padding:7px 9px;border-radius:6px;
+  width:max-content;max-width:250px;z-index:30;box-shadow:var(--shadow-lg);
+  white-space:normal;pointer-events:none;
+}
+
+/* ---------- decision tree ---------- */
+.tree{margin-top:24px;display:flex;flex-direction:column;gap:9px}
+.gate{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  display:grid;grid-template-columns:40px 1fr;overflow:hidden;box-shadow:var(--shadow);
+}
+.gate-n{
+  background:var(--surface-3);display:grid;place-items:center;
+  font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent-ink);
+  border-right:1px solid var(--line);
+}
+.gate-main{padding:13px 15px;min-width:0}
+.gate-cond{font-size:14px;font-weight:600;margin:0 0 5px;line-height:1.45}
+.gate-cond .mono{font-weight:500;color:var(--accent-ink)}
+.gate-detail{font-size:12.5px;color:var(--muted);margin:0 0 9px;line-height:1.55}
+.gate-outs{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.gate-out{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:6px;padding:4px 8px;color:var(--ink-2);
+}
+.gate-src{
+  font-family:var(--mono);font-size:10.5px;color:var(--muted);
+  margin-top:9px;word-break:break-word;
+}
+.gate.dead{border-style:dashed;background:var(--surface-2)}
+.gate.dead .gate-n{background:transparent}
+
+/* ---------- tables ---------- */
+.tablewrap{
+  overflow-x:auto;border:1px solid var(--line);border-radius:var(--radius);
+  margin-top:20px;background:var(--surface);box-shadow:var(--shadow);
+}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}
+th{
+  text-align:left;font-family:var(--mono);font-size:10.5px;font-weight:600;
+  letter-spacing:.09em;text-transform:uppercase;color:var(--muted);
+  padding:11px 13px;border-bottom:1px solid var(--line-strong);
+  background:var(--surface-2);position:sticky;top:0;white-space:nowrap;
+}
+td{padding:11px 13px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.55}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--surface-2)}
+td .mono{font-size:11.5px;color:var(--muted);word-break:break-word}
+.num{font-variant-numeric:tabular-nums;font-family:var(--mono);white-space:nowrap}
+
+/* ---------- mermaid ---------- */
+.diagram{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;overflow-x:auto;margin-top:18px;box-shadow:var(--shadow);
+}
+.diagram pre.mermaid{margin:0;background:transparent;min-width:min-content}
+details{
+  margin-top:12px;border:1px solid var(--line);border-radius:var(--radius);
+  background:var(--surface);overflow:hidden;
+}
+summary{
+  cursor:pointer;padding:11px 15px;font-family:var(--mono);font-size:12px;
+  font-weight:500;color:var(--accent-ink);list-style:none;
+  display:flex;align-items:center;gap:8px;user-select:none;
+}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";font-size:10px;color:var(--muted);transition:transform .15s}
+details[open] summary::before{transform:rotate(90deg)}
+summary:hover{background:var(--surface-2)}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+details .inner{border-top:1px solid var(--line);padding:0}
+pre.src{
+  margin:0;padding:15px;overflow-x:auto;background:var(--surface-2);
+  font-family:var(--mono);font-size:11.5px;line-height:1.6;color:var(--ink-2);
+}
+
+/* ---------- traces ---------- */
+.tabs{display:flex;gap:5px;flex-wrap:wrap;margin-top:22px}
+.tab{
+  font-family:var(--mono);font-size:12px;font-weight:500;
+  background:var(--surface);border:1px solid var(--line);color:var(--ink-2);
+  padding:6px 11px;border-radius:7px;cursor:pointer;transition:.12s;
+}
+.tab:hover{border-color:var(--line-strong);color:var(--ink)}
+.tab[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .tab[aria-selected="true"],
+:root:not([data-theme="light"]) .tab[aria-selected="true"]{color:#0D1317}
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="dark"]) .tab[aria-selected="true"]{color:#fff}
+}
+.tab:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.trace{
+  margin-top:14px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+}
+.trace-head{
+  padding:13px 16px;border-bottom:1px solid var(--line);background:var(--surface-2);
+  display:flex;gap:11px;align-items:center;flex-wrap:wrap;
+}
+.trace-in{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ink)}
+.trace-path{font-size:12px;color:var(--muted);margin-left:auto}
+.trace-steps{display:flex;flex-wrap:wrap;gap:0;padding:15px 16px;align-items:stretch}
+.tstep{
+  flex:1 1 150px;min-width:0;padding:11px 13px;background:var(--surface-2);
+  border:1px solid var(--line);border-radius:8px;margin:0 16px 10px 0;position:relative;
+}
+.tstep:last-child{margin-right:0}
+.tstep::after{
+  content:"";position:absolute;right:-12px;top:50%;
+  width:8px;height:8px;border-right:1.5px solid var(--line-strong);
+  border-top:1.5px solid var(--line-strong);transform:translateY(-50%) rotate(45deg);
+}
+.tstep:last-child::after{display:none}
+.tstep-k{
+  font-family:var(--mono);font-size:9.5px;font-weight:600;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--muted);margin-bottom:5px;
+}
+.tstep-v{font-size:13px;font-weight:500;line-height:1.4;word-break:break-word}
+.tstep-sub{font-family:var(--mono);font-size:10.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.tstep.final{background:var(--surface);border-width:1.5px}
+.tstep.final.f-block{border-color:var(--block-line);background:var(--block-soft)}
+.tstep.final.f-review{border-color:var(--review-line);background:var(--review-soft)}
+.tstep.final.f-allow{border-color:var(--allow-line);background:var(--allow-soft)}
+@media (max-width:640px){
+  .tstep{flex:1 1 100%;margin:0 0 20px 0}
+  .tstep::after{right:50%;top:auto;bottom:-15px;transform:translateX(50%) rotate(135deg)}
+}
+.trace-out{border-top:1px solid var(--line)}
+.trace-out pre{
+  margin:0;padding:14px 16px;overflow-x:auto;background:var(--surface-2);
+  font-family:var(--mono);font-size:11.5px;line-height:1.65;color:var(--ink-2);
+}
+
+/* ---------- observations ---------- */
+.obs{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.ob{
+  background:var(--surface);border:1px solid var(--line);
+  border-left:3px solid var(--line-strong);border-radius:var(--radius);
+  padding:15px 17px;box-shadow:var(--shadow);
+}
+.ob.sev-high{border-left-color:var(--block)}
+.ob.sev-med{border-left-color:var(--review)}
+.ob.sev-low{border-left-color:var(--muted)}
+.ob-head{display:flex;gap:9px;align-items:baseline;flex-wrap:wrap;margin-bottom:7px}
+.ob-n{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--muted)}
+.ob-title{font-family:var(--display);font-weight:700;font-size:14.5px;letter-spacing:-.005em}
+.ob p{font-size:13.5px;color:var(--ink-2);margin:0 0 8px}
+.ob p:last-child{margin-bottom:0}
+.ob-ev{
+  font-size:12.5px;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:7px;padding:9px 11px;color:var(--ink-2);margin-top:9px;
+}
+.ob-ev b{font-family:var(--mono);font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:4px}
+.ob-src{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:9px;word-break:break-word}
+
+/* ---------- component map ---------- */
+.layers{display:flex;flex-direction:column;gap:11px;margin-top:24px}
+.layer{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:14px 16px;box-shadow:var(--shadow);
+}
+.layer-h{
+  font-family:var(--mono);font-size:10.5px;font-weight:600;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:11px;
+  display:flex;align-items:center;gap:9px;
+}
+.layer-h::after{content:"";flex:1;height:1px;background:var(--line)}
+.mods{display:grid;gap:9px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.mod{
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 12px;
+}
+.mod-n{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--ink);word-break:break-word;margin-bottom:3px}
+.mod-d{font-size:12px;color:var(--muted);line-height:1.5}
+.mod.muted{opacity:.62;border-style:dashed}
+
+hr.div{border:none;border-top:1px solid var(--line);margin:0}
+
+.footnote{
+  margin-top:46px;padding-top:22px;border-top:1px solid var(--line);
+  font-size:12.5px;color:var(--muted);max-width:74ch;
+}
+.footnote code{font-size:11.5px}
+</style>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <span class="mark">Brand Duplicate Check</span>
+    <nav class="navlinks">
+      <a href="#overview">Overview</a>
+      <a href="#flow">Flow</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#tree">Decision tree</a>
+      <a href="#diagrams">Diagrams</a>
+      <a href="#table">Decision table</a>
+      <a href="#components">Components</a>
+      <a href="#examples">Examples</a>
+      <a href="#observations">Observations</a>
+    </nav>
+  </div>
+</div>
+
+<div class="wrap">
+
+<header class="hero">
+  <p class="eyebrow">Internal engineering documentation · verified 2026-09-23 · updated 2026-09-28</p>
+  <h1>How a proposed brand name is judged</h1>
+  <p class="lede">
+    A single-process TypeScript pipeline that decides whether a newly proposed brand name already
+    exists in a catalogue of <strong>17,653 values</strong>. Every decision comes from deterministic matching rules — no language model is involved. Every step, threshold and code reference on this page was read out of the
+    current source and, where marked, confirmed by running the real CLI.
+  </p>
+  <dl class="factbar">
+    <div class="fact"><dt>Entry point</dt><dd><code>brand-cli.ts</code> → <code>checkBrand()</code></dd></div>
+    <div class="fact"><dt>Catalogue source</dt><dd><code>response.json</code> · 17,653 values</dd></div>
+    <div class="fact"><dt>Scripts handled</dt><dd>Hebrew ↔ Latin, both directions</dd></div>
+    <div class="fact"><dt>Shortlist size</dt><dd>5 candidates · pool of 100</dd></div>
+    <div class="fact"><dt>Decision values</dt><dd><code>BLOCK</code> · <code>HUMAN_REVIEW</code> · <code>ALLOW</code></dd></div>
+  </dl>
+</header>
+
+<!-- ============ OVERVIEW ============ -->
+<section id="overview">
+  <h2>What it does</h2>
+  <p class="sec-note">
+    The checker answers one question about one proposed name. It does not scan the catalogue for
+    existing duplicate pairs, merge brands, write anything back, or call a cloud API.
+  </p>
+
+  <div class="legend">
+    <span class="legend-item"><span class="badge b-impl">Implemented</span> present and reachable in the shipped CLI path</span>
+    <span class="legend-item"><span class="badge b-not">Not wired</span> code exists, never constructed by <code>brand-cli.ts</code></span>
+    <span class="legend-item"><span class="badge b-inferred">Inferred</span> not stated in code — reasoned from structure</span>
+  </div>
+
+  <h3>The problem</h3>
+  <p>
+    The same brand reaches the catalogue written many different ways: casing and punctuation
+    (<code>LEVI'S</code> / <code>LEVIS</code>), word boundaries (<code>Dream Baby</code> /
+    <code>Dreambaby</code>), typos (<code>Adiddas</code>), and — the hard case — in the other script
+    entirely (<span class="he">אדידס</span> / <code>ADIDAS</code>). Hebrew writes no short vowels, so
+    a Hebrew spelling and its Latin original almost never agree letter by letter. Plain string
+    similarity cannot bridge that gap, which is why roughly half the codebase is transliteration and
+    phonetic machinery.
+  </p>
+
+  <h3>The three outcomes</h3>
+  <div class="outcomes">
+    <div class="outcome o-block">
+      <div class="outcome-head">
+        <span class="outcome-name">DUPLICATE</span>
+        <span class="outcome-api">decision: <code>BLOCK</code></span>
+      </div>
+      <p>The name is the same brand as one already in the catalogue. Creation should not proceed.</p>
+      <ul>
+        <li>Normalized exact match (score 1.0)</li>
+        <li>Curated transliteration exact (≥ 0.98)</li>
+        <li>Approved alias <span class="badge b-not">Not wired</span></li>
+        <li>Safe strong typo — one edit, long name</li>
+      </ul>
+    </div>
+    <div class="outcome o-review">
+      <div class="outcome-head">
+        <span class="outcome-name">REVIEW</span>
+        <span class="outcome-api">decision: <code>HUMAN_REVIEW</code></span>
+      </div>
+      <p>Nothing automatic could settle the name. A person must confirm or reject it. This is the
+      default landing place for every ambiguous cross-script pairing.</p>
+      <ul>
+        <li>Strongest candidate ≥ 0.68</li>
+        <li>Strongest is <code>COMPACT_EXACT</code> or <code>RELATED_NAME</code></li>
+        <li>Convincing cross-language evidence</li>
+      </ul>
+    </div>
+    <div class="outcome o-allow">
+      <div class="outcome-head">
+        <span class="outcome-name">NEW</span>
+        <span class="outcome-api">decision: <code>ALLOW</code></span>
+      </div>
+      <p>No plausible duplicate. The name may be created.</p>
+      <ul>
+        <li>No candidates at all (confidence 1)</li>
+        <li>Strongest candidate &lt; 0.68 and no cross-language evidence</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="ob sev-med" style="margin-top:20px">
+    <div class="ob-head"><span class="ob-title">On the word “confidence”</span></div>
+    <p>
+      <code>BrandCheckResult.confidence</code> carries two different quantities. On
+      <span class="badge b-block">Block</span> and <span class="badge b-review">Review</span> it is a
+      match score — higher means more likely a duplicate. On <span class="badge b-allow">Allow</span>
+      it is <em>headroom below the match threshold</em> — a small number means the call was close.
+      The terminal formatter relabels it (“Margin below a match”). The confidence figure is internal:
+      the report file carries only ALLOW or REVIEW.
+    </p>
+    <div class="ob-src">types.ts:170 · brand-result-formatter.ts:52–54 · decision-engine.ts:104</div>
+  </div>
+</section>
+
+<!-- ============ FLOW ============ -->
+<section id="flow">
+  <h2>End-to-end flow</h2>
+  <p class="sec-note">
+    Stages 1 and 2 run once per process. Stages 3 to 7 run per proposed name.
+  </p>
+
+  <div class="spine">
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">1</div><div class="spine-line"></div></div>
+      <div class="spine-body">
+        <div class="spine-title">Catalogue load <span class="badge b-impl">Implemented</span></div>
+        <p>The raw API payload is flattened into <code>Brand{code, label, translations[]}</code>.
+        Entries missing a string <code>code</code> or <code>label</code> are dropped silently.</p>
+        <div class="spine-src"><b>brand-adapter.ts</b> · parseBrandResponse() ← response.json</div>
+      </div>
+    </div>
+
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">2</div><div class="spine-line"></div></div>
+      <div class="spine-body">
+        <div class="spine-title">Index construction <span class="badge b-impl">Implemented</span></div>
+        <p>Each brand label <em>and every translation</em> becomes an index entry. Twelve maps are
+        built: normalized text, compact text, 2-char prefix, first character, bigrams, romanization
+        exact / prefix / bigram, consonant skeleton, and two phonetic key maps. Romanizations and
+        phonetic keys are computed once here, never per check.</p>
+        <div class="spine-src"><b>brand-index.ts</b> · BrandIndex.add()</div>
+      </div>
+    </div>
+
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">3</div><div class="spine-line"></div></div>
+      <div class="spine-body">
+        <div class="spine-title">Normalization <span class="badge b-impl">Implemented</span></div>
+        <p>NFKC, strip invisible formatting, unify apostrophes and quotes, turn hyphens and
+        ampersands into spaces, drop safe punctuation, collapse whitespace, lowercase. Produces
+        <code>normalizedText</code> and <code>compactText</code> (spaces removed).</p>
+        <div class="spine-src"><b>brand-normalizer.ts</b> · normalizeBrandNameParts()</div>
+      </div>
+    </div>
+
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">4</div><div class="spine-line"></div></div>
+      <div class="spine-body">
+        <div class="spine-title">Same-script retrieval &amp; scoring <span class="badge b-impl">Implemented</span></div>
+        <p>Weighted retrieval builds a pool of up to 100 entries, each scored by a weighted blend of
+        edit, bigram, token, length and prefix similarity, then classified into a match type. Top 5 returned.</p>
+        <div class="spine-src"><b>candidate-generator.ts</b> · <b>brand-candidate-scorer.ts</b> · <b>string-similarity.ts</b></div>
+      </div>
+    </div>
+
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">5</div><div class="spine-line"></div></div>
+      <div class="spine-body">
+        <div class="spine-title">Cross-script retrieval &amp; scoring <span class="badge b-impl">Implemented</span></div>
+        <p>Three independent sub-paths run and their results are merged per brand: Hebrew→Latin
+        romanization, Latin→Hebrew expansion, and phonetic alignment. A credibility filter rejects
+        pairings that only exist because an unlikely spelling was invented.</p>
+        <div class="spine-src"><b>cross-language-candidate-generator.ts</b> · transliteration-service.ts · latin-to-hebrew-transliteration.ts · cross-script-phonetic-matcher.ts</div>
+      </div>
+    </div>
+
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">6</div><div class="spine-line"></div></div>
+      <div class="spine-body">
+        <div class="spine-title">Merge &amp; reserved slots <span class="badge b-impl">Implemented</span></div>
+        <p>Candidates are deduplicated by brand code keeping the highest score, sorted, and cut to 5.
+        Two of those five slots are then <em>guaranteed</em> to the strongest cross-script candidates,
+        which displace the weakest non-guaranteed entries — a Latin input could otherwise fill every
+        slot with Latin lookalikes and push the Hebrew spelling of the same brand off the list.</p>
+        <div class="spine-src"><b>brand-duplicate-checker.ts</b> · mergeCandidates() · withCrossLanguageCandidates()</div>
+      </div>
+    </div>
+
+    <div class="spine-step">
+      <div class="spine-rail"><div class="spine-num">7</div></div>
+      <div class="spine-body">
+        <div class="spine-title">Deterministic decision <span class="badge b-impl">Implemented</span></div>
+        <p>Seven ordered gates. The first that matches wins. Exact, curated-transliteration, alias and
+        safe-typo gates produce <span class="badge b-block">Block</span>; everything else falls through
+        to a review test and finally to <span class="badge b-allow">Allow</span>.</p>
+        <div class="spine-src"><b>decision-engine.ts</b> · DecisionEngine.decide()</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ PIPELINE ============ -->
+<section id="pipeline">
+  <h2>Detailed pipeline</h2>
+  <p class="sec-note">One card per processing stage. Hover a threshold chip for the reasoning recorded in the source.</p>
+
+  <div class="stages">
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 01 · startup</span>
+        <h3 class="stage-name" style="margin:0">Payload adaptation</h3>
+        <p class="stage-purpose">Turn the raw values-list API response into the internal brand model.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Parsed <code>response.json</code> (unknown)</span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v"><code>Brand[]</code> — code, label, optional translations</span></div>
+        <div class="stage-foot">
+          <span><b>brand-adapter.ts</b></span>
+          <span>parseBrandResponse()</span>
+          <span>reads <code>values_lists[].values[].label_translations</code></span>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 02 · startup</span>
+        <h3 class="stage-name" style="margin:0">Index construction</h3>
+        <p class="stage-purpose">Precompute every lookup key, including romanizations and pronunciations.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v"><code>Brand[]</code></span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v">12 posting-list maps of <code>BrandIndexEntry</code></span></div>
+        <div class="io"><span class="io-k">Note</span><span class="io-v">Indexed brands keep only near-canonical spellings — speculative readings belong on the query side.</span></div>
+        <div class="stage-foot">
+          <span><b>brand-index.ts</b></span>
+          <span>BrandIndex.add()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="INDEX_VARIANT_BUDGET — romanizations kept per indexed brand.">24 variants</span>
+            <span class="thr" tabindex="0" data-tip="INDEX_VARIANT_MAX_COST — indexed spellings may cost at most 1 step of speculation.">max cost 1</span>
+            <span class="thr" tabindex="0" data-tip="SKELETON_INDEX_MINIMUM_LENGTH — shortest consonant skeleton that earns a posting list. A retrieval floor, deliberately below the decision engine's evidence floor of 5.">skeleton ≥ 3</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 03 · per check</span>
+        <h3 class="stage-name" style="margin:0">Normalization</h3>
+        <p class="stage-purpose">Reduce a written name to a comparable form without losing identity.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v"><code>string | null | undefined</code></span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v"><code>{ normalizedText, compactText }</code></span></div>
+        <div class="io"><span class="io-k">Does</span><span class="io-v">NFKC → strip zero-width → unify <code>'</code> and <code>"</code> → hyphens &amp; <code>&amp;</code> to space → drop <code>.,;:!?()[]{}/\</code> → collapse space → lowercase → trim</span></div>
+        <div class="stage-foot">
+          <span><b>brand-normalizer.ts</b></span>
+          <span>normalizeBrandNameParts()</span>
+          <span>A non-string input yields two empty strings, which short-circuits every generator.</span>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 04a · per check</span>
+        <h3 class="stage-name" style="margin:0">Same-script retrieval</h3>
+        <p class="stage-purpose">Pull a bounded pool of plausible neighbours from the index.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v"><code>normalizedText</code>, <code>compactText</code></span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v">≤ 100 <code>BrandIndexEntry</code>, ordered by retrieval weight</span></div>
+        <div class="io"><span class="io-k">Weights</span><span class="io-v"><span class="num">1000</span> exact · <span class="num">900</span> compact · <span class="num">5</span> 2-char prefix · <span class="num">2</span> first char · <span class="num">1</span> per shared bigram</span></div>
+        <div class="stage-foot">
+          <span><b>candidate-generator.ts</b></span>
+          <span>CandidateGenerator.generate()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="candidatePoolSize — entries scored per check.">pool 100</span>
+            <span class="thr" tabindex="0" data-tip="maxCandidates — candidates returned by this generator.">top 5</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 04b · per check</span>
+        <h3 class="stage-name" style="margin:0">Similarity scoring</h3>
+        <p class="stage-purpose">Produce an explainable score and a match type per pooled brand.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v"><code>normalizedText</code> + one <code>BrandIndexEntry</code></span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v"><code>BrandCandidate</code> with full <code>SimilaritySignals</code></span></div>
+        <div class="io"><span class="io-k">Score</span><span class="io-v" style="font-family:var(--mono);font-size:11.5px">0.50·edit + 0.30·bigram + 0.10·token + 0.05·length + 0.05·prefix</span></div>
+        <div class="io"><span class="io-k">Types</span><span class="io-v"><code>NORMALIZED_EXACT</code> 1.0 · <code>COMPACT_EXACT</code> 0.97 · <code>RELATED_NAME</code> (token prefix, +0.22) · <code>HIGH_FUZZY</code> · <code>POSSIBLE_TYPO</code> · <code>TOKEN_VARIANT</code> · <code>WEAK_SIMILARITY</code></span></div>
+        <div class="stage-foot">
+          <span><b>brand-candidate-scorer.ts</b> · <b>string-similarity.ts</b></span>
+          <span>score() · classifyFuzzyMatch() · StringSimilarityService.compare()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="Damerau-Levenshtein ≤ 1 with equal token counts: ≥ 0.82 is HIGH_FUZZY, below is POSSIBLE_TYPO.">HIGH_FUZZY ≥ 0.82</span>
+            <span class="thr" tabindex="0" data-tip="tokenSimilarity ≥ 0.5 with equal token counts classifies as TOKEN_VARIANT.">token ≥ 0.5</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 05a · per check</span>
+        <h3 class="stage-name" style="margin:0">Hebrew → Latin romanization</h3>
+        <p class="stage-purpose">Expand a Hebrew input into the Latin spellings it could stand for.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Hebrew input string</span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v">≤ 128 <code>TransliterationVariant</code>, cheapest first</span></div>
+        <div class="io"><span class="io-k">How</span><span class="io-v">Beam search over per-letter and digraph readings, each with a speculation cost. Retrieval hits the romanization exact key (1000), the consonant skeleton (800), prefix (5) and bigrams (1).</span></div>
+        <div class="stage-foot">
+          <span><b>transliteration-service.ts</b></span>
+          <span>getLatinVariants() · toConsonantSkeleton()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="confidence = max(0.2, 0.75 − 0.16 × cost). The cheapest generated reading is therefore 0.75, never 1.">conf 0.75 − 0.16·cost</span>
+            <span class="thr" tabindex="0" data-tip="Curated pairs carry source CURATED and confidence 1 and are the only entries that can reach a deterministic cross-script BLOCK: 7 hand-written ones in commonBrandRepresentations plus the verified brand pairs in data/phonetic-transliteration-rules.json (generic words excluded), used in both directions.">≈125 curated pairs</span>
+            <span class="thr" tabindex="0" data-tip="EXPANSION_BEAM — widest intermediate frontier kept while expanding one name.">beam 512</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 05b · per check</span>
+        <h3 class="stage-name" style="margin:0">Latin → Hebrew expansion</h3>
+        <p class="stage-purpose">Expand a Latin input into the Hebrew spellings a person might have typed.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Latin input string</span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v">≤ 128 Hebrew <code>TransliterationVariant</code>, always <code>source: GENERATED</code></span></div>
+        <div class="io"><span class="io-k">How</span><span class="io-v">Per-word beam expansion with longest-unit-first matching (<code>tch</code>, <code>alw</code>, <code>ife</code>, <code>ph</code>…) and English suffix rules (<code>-ed</code>→<span class="he">ד</span>, <code>-tion</code>→<span class="he">שן</span>). Retrieves against the native-script index.</span></div>
+        <div class="stage-foot">
+          <span><b>latin-to-hebrew-transliteration.ts</b></span>
+          <span>getHebrewVariants() · scoreHebrewExpansion() · toHebrewConsonantSkeleton()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="HEBREW_FUZZY_RETRIEVAL_VARIANTS — spellings that take part in the bigram sweep; the rest still get exact lookups.">sweep 8</span>
+            <span class="thr" tabindex="0" data-tip="HEBREW_SCORED_VARIANTS — spellings each pooled brand is scored against.">scored 32</span>
+            <span class="thr" tabindex="0" data-tip="MINIMUM_PER_WORD_BUDGET — floor on each word's share of the budget in a multi-word name.">≥ 12 per word</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 05c · per check</span>
+        <h3 class="stage-name" style="margin:0">Phonetic alignment</h3>
+        <p class="stage-purpose">Pair names by how they sound when no spelling lines up at all.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Both names as <code>PhoneticName</code> token lists</span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v"><code>PhoneticMatch{ similarity, relation, orthography, rendered }</code></span></div>
+        <div class="io"><span class="io-k">How</span><span class="io-v">Hebrew letters keep every sound they can stand for; Latin names are read by English, French, Italian, German and literal rules. A weighted edit alignment scores the pair, then coverage rules decide whether that distance is <em>evidence</em>.</span></div>
+        <div class="io"><span class="io-k">Rules</span><span class="io-v">Every consonant on both sides must pair with an equal or kindred consonant. Short names may not lean on vowels either spelling contradicts.</span></div>
+        <div class="stage-foot">
+          <span><b>cross-script-phonetic-matcher.ts</b> · <b>phonetic-aligner.ts</b> · <b>phonetic-alphabet.ts</b></span>
+          <span>matchPhoneticNames() · alignPhonetically() · admitsPhoneticAlignment()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="minimumSimilarity by consonant count. Measured over 191 true pairs against 112 invented names: 4+ consonants bottom out at 0.870 while the closest invented name reaches 0.772.">≥ 0.82 / 0.87 / 0.88</span>
+            <span class="thr" tabindex="0" data-tip="PHONETIC_SCORE_SCALE — the highest score a pairing confirmed by sound can reach. Phonetic evidence never blocks.">scale 0.95</span>
+            <span class="thr" tabindex="0" data-tip="PHONETIC_SUBSET_FACTOR — applied when one name adds words the other lacks, like DIOR against דיאור הום.">subset ×0.85</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 05d · per check</span>
+        <h3 class="stage-name" style="margin:0">Credibility filter</h3>
+        <p class="stage-purpose">Reject cross-script pairings that exist only because an unlikely spelling was invented.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Scored cross-language <code>BrandCandidate</code></span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v">Keep or discard</span></div>
+        <div class="io"><span class="io-k">Scope</span><span class="io-v">Applies to the Latin→Hebrew direction only — the direction that invents a spelling for the input.</span></div>
+        <div class="stage-foot">
+          <span><b>cross-language-candidate-generator.ts</b></span>
+          <span>isCredibleCrossLanguageMatch()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="crossLanguageCandidateThreshold — the retrieval floor every cross-language candidate must clear.">score ≥ 0.55</span>
+            <span class="thr" tabindex="0" data-tip="EXACT_HEBREW_MINIMUM_CONFIDENCE — true landings sit at 0.59 while the one invented name that reaches a real brand sits at 0.43. The floor belongs in that gap.">exact conf ≥ 0.5</span>
+            <span class="thr" tabindex="0" data-tip="CREDIBLE_SKELETON_MINIMUM_LENGTH — three consonants collide constantly; four is where a skeleton starts naming one brand rather than a crowd.">skeleton ≥ 4</span>
+            <span class="thr" tabindex="0" data-tip="SHORT_HEBREW_MINIMUM_SIMILARITY — a Hebrew spelling under 7 letters must land essentially exactly, because קורל and קורס differ by one letter and still score ~0.75.">short ≥ 0.95</span>
+            <span class="thr" tabindex="0" data-tip="FUZZY_CROSS_LANGUAGE_MINIMUM_SIMILARITY — below this, a pairing rests on an invented spelling that merely resembles an unrelated brand.">fuzzy ≥ 0.72</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 06 · per check</span>
+        <h3 class="stage-name" style="margin:0">Merge &amp; reserved slots</h3>
+        <p class="stage-purpose">Build one ranked shortlist without letting same-script lookalikes crowd out the other script.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Alias + same-script + cross-language candidate groups</span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v">≤ 5 <code>BrandCandidate</code>, descending score</span></div>
+        <div class="io"><span class="io-k">Rule</span><span class="io-v">Dedupe by brand code keeping the higher score, then guarantee places to the top cross-script candidates, each displacing the weakest non-guaranteed entry.</span></div>
+        <div class="stage-foot">
+          <span><b>brand-duplicate-checker.ts</b></span>
+          <span>mergeCandidates() · withCrossLanguageCandidates()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="crossLanguageReservedSlots — one slot was not enough: a weak cross-script hit (MRD for מריל, ASKO for אסקדה) filled it and shut out the right brand. Capped at maxCandidates − 1 so the top candidate is never evicted.">2 reserved of 5</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="stage">
+      <div class="stage-head">
+        <span class="stage-idx">Stage 07 · per check</span>
+        <h3 class="stage-name" style="margin:0">Deterministic decision</h3>
+        <p class="stage-purpose">Apply ordered gates; the first match wins.</p>
+      </div>
+      <div class="stage-body">
+        <div class="io"><span class="io-k">In</span><span class="io-v">Ranked candidates</span></div>
+        <div class="io"><span class="io-k">Out</span><span class="io-v"><code>{ decision, confidence }</code></span></div>
+        <div class="stage-foot">
+          <span><b>decision-engine.ts</b></span>
+          <span>DecisionEngine.decide()</span>
+          <div class="thresholds">
+            <span class="thr" tabindex="0" data-tip="exactBlockThreshold — NORMALIZED_EXACT scores exactly 1.0, so this gate fires on any normalized exact match.">exact ≥ 1.0</span>
+            <span class="thr" tabindex="0" data-tip="transliterationExactBlockThreshold — generated transliteration is deterministic but not a proof of identity in every language context.">translit ≥ 0.98</span>
+            <span class="thr" tabindex="0" data-tip="strongFuzzyBlockThreshold — a one-edit, same-token typo in a sufficiently long name is strong enough to block.">typo ≥ 0.80</span>
+            <span class="thr" tabindex="0" data-tip="reviewThreshold — below this, and with no cross-language evidence, the name is allowed.">review ≥ 0.68</span>
+          </div>
+        </div>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ============ DECISION TREE ============ -->
+<section id="tree">
+  <h2>Decision tree</h2>
+  <p class="sec-note">
+    The exact order of <code>DecisionEngine.decide()</code>. Every gate is a deterministic rule.
+  </p>
+
+  <div class="tree">
+
+    <div class="gate">
+      <div class="gate-n">1</div>
+      <div class="gate-main">
+        <p class="gate-cond">Is there a <span class="mono">NORMALIZED_EXACT</span> candidate scoring ≥ <span class="num">1.0</span>?</p>
+        <p class="gate-detail">Both names reduce to the same normalized text. Covers casing, punctuation, hyphens, ampersands, apostrophes and whitespace.</p>
+        <div class="gate-outs">
+          <span class="gate-out">Yes → <span class="badge b-block">Duplicate</span> confidence = 1.0</span>
+          <span class="gate-out">No → gate 2</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:31–34 · config <span class="mono">exactBlockThreshold: 1</span></div>
+      </div>
+    </div>
+
+    <div class="gate dead">
+      <div class="gate-n">2</div>
+      <div class="gate-main">
+        <p class="gate-cond">Is there a <span class="mono">COMPACT_EXACT</span> candidate scoring ≥ <span class="num">1.0</span>? <span class="badge b-inferred">Unreachable</span></p>
+        <p class="gate-detail">
+          Compact matching removes word boundaries (<code>Dream Baby</code> ↔ <code>Dreambaby</code>).
+          The scorer assigns <code>COMPACT_EXACT</code> a fixed <span class="num">0.97</span>, so the gate
+          can never fire — compact-only matches fall through to review at gate 7. This is intentional
+          (“surfaced but remains review-only by default”), but the condition is written as a tunable
+          threshold when it is effectively a hard-coded <em>never</em>.
+        </p>
+        <div class="gate-outs">
+          <span class="gate-out">Always → gate 3</span>
+          <span class="gate-out"><span class="badge b-review">Review</span> reached later at gate 7</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:36–39 · brand-candidate-scorer.ts:65–72 · config <span class="mono">compactExactBlockThreshold: 1</span></div>
+      </div>
+    </div>
+
+    <div class="gate">
+      <div class="gate-n">3</div>
+      <div class="gate-main">
+        <p class="gate-cond">Is there a <span class="mono">TRANSLITERATION_EXACT</span> candidate with <span class="mono">transliterationExact</span> and <span class="mono">source === "CURATED"</span> scoring ≥ <span class="num">0.98</span>?</p>
+        <p class="gate-detail">
+          Three conditions must hold at once. A <em>generated</em> transliteration scores
+          <code>0.8 + 0.19 × confidence</code> and generated confidence caps at 0.75, giving a ceiling of
+          <span class="num">0.9425</span> — below 0.98. So both the source check and the score check
+          independently restrict this gate to curated pairs: 7 hand-written in
+          <code>commonBrandRepresentations</code> plus the verified brand pairs loaded from
+          <code>data/phonetic-transliteration-rules.json</code> by <code>brand-overrides.ts</code>.
+        </p>
+        <div class="gate-outs">
+          <span class="gate-out">Yes → <span class="badge b-block">Duplicate</span></span>
+          <span class="gate-out">No → gate 4</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:41–52 · transliteration-service.ts:79–88, 171 · brand-candidate-scorer.ts:115</div>
+      </div>
+    </div>
+
+    <div class="gate">
+      <div class="gate-n">4</div>
+      <div class="gate-main">
+        <p class="gate-cond">Is there an <span class="mono">APPROVED_ALIAS</span> candidate? <span class="badge b-not">Not wired</span></p>
+        <p class="gate-detail">No score threshold — an approved alias blocks outright. Aliases are explicitly curated and never inferred. The CLI constructs no alias resolver, so this gate never fires in production.</p>
+        <div class="gate-outs">
+          <span class="gate-out">Yes → <span class="badge b-block">Duplicate</span></span>
+          <span class="gate-out">No → gate 5</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:54–57 · brand-alias-resolver.ts · brand-cli.ts:25</div>
+      </div>
+    </div>
+
+    <div class="gate">
+      <div class="gate-n">5</div>
+      <div class="gate-main">
+        <p class="gate-cond">Is the candidate list empty?</p>
+        <p class="gate-detail">Nothing was retrieved at all — the strongest possible signal that the name is new.</p>
+        <div class="gate-outs">
+          <span class="gate-out">Yes → <span class="badge b-allow">New</span> confidence = 1</span>
+          <span class="gate-out">No → gate 6</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:59–62</div>
+      </div>
+    </div>
+
+    <div class="gate">
+      <div class="gate-n">6</div>
+      <div class="gate-main">
+        <p class="gate-cond">Is the strongest candidate a <span class="mono">safe strong typo</span>?</p>
+        <p class="gate-detail">
+          All of: type is <code>HIGH_FUZZY</code>; edit distance exactly 1; score ≥ 0.80; equal token
+          counts; not a prefix variant; both names longer than 3 characters; shorter name ≥ 6 characters.
+          Short names are excluded by <code>shortNameFuzzyBlockThreshold: 1.01</code> — a value above the
+          maximum possible score, encoding “never” as an unreachable number. A replaced letter must also be
+          typeable: when the two keys are not neighbours on the keyboard (Hebrew SI 1452 or QWERTY) and the
+          letters do not spell one sound, the pair scores as two edits and classifies as
+          <code>WEAK_SIMILARITY</code> — סטפיל is not a typo of סטייל.
+        </p>
+        <div class="gate-outs">
+          <span class="gate-out">Yes → <span class="badge b-block">Duplicate</span></span>
+          <span class="gate-out">No → gate 7</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:64–66, 376–401 · config <span class="mono">strongFuzzyBlockThreshold 0.8 · shortNameMaxLength 3 · strongFuzzyMinLength 6</span></div>
+      </div>
+    </div>
+
+    <div class="gate">
+      <div class="gate-n">7</div>
+      <div class="gate-main">
+        <p class="gate-cond">Final fall-through: is any review condition true?</p>
+        <p class="gate-detail">
+          Only whole-name candidates count from gate 5 on. A candidate marked <code>partialMatch</code> —
+          the proposed name adds words to it (קלין לוג'יק against קלין, NIVEA MEN against NIVEA), or one
+          word differs entirely from the word in its place (קליר דיאה against קליר דיי) — stays in the list
+          but is skipped, as is a cross-script spelling resemblance that neither pronunciation nor the
+          consonants confirm (סטפיל reads “stpl”, one letter from STP). Among the rest: strongest is <code>COMPACT_EXACT</code> or <code>RELATED_NAME</code>, <b>or</b> cross-language
+          evidence exists, <b>or</b> the strongest score ≥ <span class="num">0.68</span>. Cross-language
+          evidence means some candidate, at any rank, carries a <em>convincing</em> signal — an exact
+          transliteration, a shared consonant skeleton of ≥ 5 letters, or a match confirmed by
+          pronunciation at similarity ≥ 0.72. A spelling that merely looks alike is not evidence on its
+          own: expanding a name into the other script reaches some unrelated brand for almost any input
+          (HQ reached הקס at 0.60), so such a guess reviews only when it scores ≥ 0.68 itself.
+        </p>
+        <div class="gate-outs">
+          <span class="gate-out">Yes → <span class="badge b-review">Review</span> confidence = max(strongest, evidence)</span>
+          <span class="gate-out">No → <span class="badge b-allow">New</span> confidence = 1 − strongest score</span>
+        </div>
+        <div class="gate-src">decision-engine.ts:78–104, 321–334 · config <span class="mono">reviewThreshold 0.68 · crossLanguageEvidenceThreshold 0.72 · skeletonEvidenceMinimumLength 5</span></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ DIAGRAMS ============ -->
+<section id="diagrams">
+  <h2>Mermaid diagrams</h2>
+  <p class="sec-note">Rendered below, with the source available for copying into a wiki or a PR description.</p>
+
+  <h3>Main flowchart</h3>
+  <div class="diagram">
+<pre class="mermaid">
+flowchart TD
+  IN["Proposed brand name<br/>brand-cli.ts main   stdin line"]
+  IN --> NORM["normalizeBrandNameParts<br/>brand-normalizer.ts<br/>NFKC, strip punctuation, lowercase<br/>to normalizedText + compactText"]
+
+  NORM --> ALIAS["aliasCandidate<br/>brand-duplicate-checker.ts<br/>APPROVED_ALIAS - NOT WIRED in CLI"]
+  NORM --> SS["CandidateGenerator.generate<br/>candidate-generator.ts<br/>exact 1000, compact 900, prefix 5,<br/>firstChar 2, bigram 1 - pool 100"]
+  NORM --> XL["CrossLanguageCandidateGenerator.generate<br/>cross-language-candidate-generator.ts"]
+
+  SS --> SCORE["BrandCandidateScorer.score<br/>0.5 edit + 0.3 bigram + 0.1 token<br/>+ 0.05 length + 0.05 prefix"]
+
+  XL --> XLA["Hebrew to Latin romanization<br/>TransliterationService.getLatinVariants"]
+  XL --> XLB["Latin to Hebrew expansion<br/>LatinToHebrewTransliterationService.getHebrewVariants"]
+  XL --> XLC["Phonetic alignment<br/>matchPhoneticNames / alignPhonetically"]
+  XLA --> CRED
+  XLB --> CRED
+  XLC --> CRED["isCredibleCrossLanguageMatch<br/>score at least 0.55, skeleton at least 4,<br/>short Hebrew needs 0.95"]
+
+  ALIAS --> MERGE
+  SCORE --> MERGE
+  CRED --> MERGE["mergeCandidates + withCrossLanguageCandidates<br/>top 5, two slots reserved for cross-script"]
+
+  MERGE --> G1{"NORMALIZED_EXACT<br/>score at least 1.0"}
+  G1 -->|yes| BLOCK["BLOCK = DUPLICATE"]
+  G1 -->|no| G2{"COMPACT_EXACT<br/>score at least 1.0<br/>score fixed at 0.97 - unreachable"}
+  G2 -->|no| G3{"TRANSLITERATION_EXACT<br/>source CURATED<br/>score at least 0.98"}
+  G3 -->|yes| BLOCK
+  G3 -->|no| G4{"APPROVED_ALIAS present<br/>NOT WIRED"}
+  G4 -->|yes| BLOCK
+  G4 -->|no| G5{"Any candidates"}
+  G5 -->|no| ALLOW["ALLOW = NEW"]
+  G5 -->|yes| G6{"isSafeStrongTypo<br/>HIGH_FUZZY, edit distance 1,<br/>score at least 0.8, min length at least 6"}
+  G6 -->|yes| BLOCK
+  G6 -->|no| G7{"COMPACT_EXACT or RELATED_NAME strongest<br/>or cross-language evidence<br/>or score at least 0.68"}
+  G7 -->|no| ALLOW
+  G7 -->|yes| REVIEW["HUMAN_REVIEW = REVIEW"]
+
+  classDef blk fill:#B3261E,stroke:#7F1D1B,color:#ffffff
+  classDef rev fill:#A05800,stroke:#6E3D00,color:#ffffff
+  classDef alw fill:#1B6E47,stroke:#12472E,color:#ffffff
+  classDef dead stroke-dasharray: 5 5
+  class BLOCK blk
+  class REVIEW rev
+  class ALLOW alw
+  class G2,G4,ALIAS dead
+</pre>
+  </div>
+
+  <details>
+    <summary>Flowchart source</summary>
+    <div class="inner"><pre class="src">flowchart TD
+  IN["Proposed brand name&lt;br/&gt;brand-cli.ts main   stdin line"]
+  IN --&gt; NORM["normalizeBrandNameParts&lt;br/&gt;brand-normalizer.ts&lt;br/&gt;NFKC, strip punctuation, lowercase&lt;br/&gt;to normalizedText + compactText"]
+
+  NORM --&gt; ALIAS["aliasCandidate&lt;br/&gt;brand-duplicate-checker.ts&lt;br/&gt;APPROVED_ALIAS - NOT WIRED in CLI"]
+  NORM --&gt; SS["CandidateGenerator.generate&lt;br/&gt;candidate-generator.ts&lt;br/&gt;exact 1000, compact 900, prefix 5,&lt;br/&gt;firstChar 2, bigram 1 - pool 100"]
+  NORM --&gt; XL["CrossLanguageCandidateGenerator.generate&lt;br/&gt;cross-language-candidate-generator.ts"]
+
+  SS --&gt; SCORE["BrandCandidateScorer.score&lt;br/&gt;0.5 edit + 0.3 bigram + 0.1 token&lt;br/&gt;+ 0.05 length + 0.05 prefix"]
+
+  XL --&gt; XLA["Hebrew to Latin romanization&lt;br/&gt;TransliterationService.getLatinVariants"]
+  XL --&gt; XLB["Latin to Hebrew expansion&lt;br/&gt;LatinToHebrewTransliterationService.getHebrewVariants"]
+  XL --&gt; XLC["Phonetic alignment&lt;br/&gt;matchPhoneticNames / alignPhonetically"]
+  XLA --&gt; CRED
+  XLB --&gt; CRED
+  XLC --&gt; CRED["isCredibleCrossLanguageMatch&lt;br/&gt;score at least 0.55, skeleton at least 4,&lt;br/&gt;short Hebrew needs 0.95"]
+
+  ALIAS --&gt; MERGE
+  SCORE --&gt; MERGE
+  CRED --&gt; MERGE["mergeCandidates + withCrossLanguageCandidates&lt;br/&gt;top 5, two slots reserved for cross-script"]
+
+  MERGE --&gt; G1{"NORMALIZED_EXACT&lt;br/&gt;score at least 1.0"}
+  G1 --&gt;|yes| BLOCK["BLOCK = DUPLICATE"]
+  G1 --&gt;|no| G2{"COMPACT_EXACT&lt;br/&gt;score at least 1.0&lt;br/&gt;score fixed at 0.97 - unreachable"}
+  G2 --&gt;|no| G3{"TRANSLITERATION_EXACT&lt;br/&gt;source CURATED&lt;br/&gt;score at least 0.98"}
+  G3 --&gt;|yes| BLOCK
+  G3 --&gt;|no| G4{"APPROVED_ALIAS present&lt;br/&gt;NOT WIRED"}
+  G4 --&gt;|yes| BLOCK
+  G4 --&gt;|no| G5{"Any candidates"}
+  G5 --&gt;|no| ALLOW["ALLOW = NEW"]
+  G5 --&gt;|yes| G6{"isSafeStrongTypo&lt;br/&gt;HIGH_FUZZY, edit distance 1,&lt;br/&gt;score at least 0.8, min length at least 6"}
+  G6 --&gt;|yes| BLOCK
+  G6 --&gt;|no| G7{"COMPACT_EXACT or RELATED_NAME strongest&lt;br/&gt;or cross-language evidence&lt;br/&gt;or score at least 0.68"}
+  G7 --&gt;|no| ALLOW
+  G7 --&gt;|yes| REVIEW["HUMAN_REVIEW = REVIEW"]
+
+  classDef blk fill:#B3261E,stroke:#7F1D1B,color:#ffffff
+  classDef rev fill:#A05800,stroke:#6E3D00,color:#ffffff
+  classDef alw fill:#1B6E47,stroke:#12472E,color:#ffffff
+  classDef dead stroke-dasharray: 5 5
+  class BLOCK blk
+  class REVIEW rev
+  class ALLOW alw
+  class G2,G4,ALIAS dead</pre></div>
+  </details>
+
+  <h3>Sequence diagram</h3>
+  <div class="diagram">
+<pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor U as Operator
+    participant CLI as brand-cli.ts
+    participant CH as BrandDuplicateChecker
+    participant N as brand-normalizer
+    participant IDX as BrandIndex
+    participant CG as CandidateGenerator
+    participant XG as CrossLanguageCandidateGenerator
+    participant SC as BrandCandidateScorer
+    participant DE as DecisionEngine
+
+    rect rgb(238, 241, 243)
+    Note over CLI,IDX: startup, once per process
+    CLI->>CLI: parseBrandResponse of response.json
+    CLI->>IDX: new BrandIndex with 17653 values
+    IDX->>IDX: normalize, romanize, phoneticKeys per name
+    end
+
+    U->>CLI: writes a brand name on stdin
+    CLI->>CH: checkBrand name
+
+    CH->>N: normalizeBrandNameParts
+    N-->>CH: normalizedText, compactText
+
+    CH->>CG: generate
+    CG->>IDX: findEntriesByNormalizedText / Compact / Prefix / Ngram
+    IDX-->>CG: pooled entries, at most 100
+    CG->>SC: score per entry
+    SC-->>CG: BrandCandidate with SimilaritySignals
+    CG-->>CH: top 5 same-script
+
+    CH->>XG: generate
+    XG->>IDX: transliteration, skeleton and phonetic key lookups
+    IDX-->>XG: cross-script pool
+    XG->>SC: scoreCrossLanguage / scoreHebrewExpansion / scorePhonetic
+    SC-->>XG: BrandCandidate with CrossLanguageSignals
+    XG->>XG: isCredibleCrossLanguageMatch
+    XG-->>CH: credible cross-script candidates
+
+    CH->>CH: mergeCandidates and withCrossLanguageCandidates
+    CH->>DE: decide candidates
+    DE-->>CH: decision and confidence
+
+    CH-->>CLI: BrandCheckResult
+
+    CLI->>CLI: formatBrandCheckResult
+    CLI-->>U: readable report on stderr
+    CLI-->>U: ALLOW / REVIEW report written to .txt and .csv
+</pre>
+  </div>
+
+  <details>
+    <summary>Sequence diagram source</summary>
+    <div class="inner"><pre class="src">sequenceDiagram
+    autonumber
+    actor U as Operator
+    participant CLI as brand-cli.ts
+    participant CH as BrandDuplicateChecker
+    participant N as brand-normalizer
+    participant IDX as BrandIndex
+    participant CG as CandidateGenerator
+    participant XG as CrossLanguageCandidateGenerator
+    participant SC as BrandCandidateScorer
+    participant DE as DecisionEngine
+
+    rect rgb(238, 241, 243)
+    Note over CLI,IDX: startup, once per process
+    CLI-&gt;&gt;CLI: parseBrandResponse of response.json
+    CLI-&gt;&gt;IDX: new BrandIndex with 17653 values
+    IDX-&gt;&gt;IDX: normalize, romanize, phoneticKeys per name
+    end
+
+    U-&gt;&gt;CLI: writes a brand name on stdin
+    CLI-&gt;&gt;CH: checkBrand name
+
+    CH-&gt;&gt;N: normalizeBrandNameParts
+    N--&gt;&gt;CH: normalizedText, compactText
+
+    CH-&gt;&gt;CG: generate
+    CG-&gt;&gt;IDX: findEntriesByNormalizedText / Compact / Prefix / Ngram
+    IDX--&gt;&gt;CG: pooled entries, at most 100
+    CG-&gt;&gt;SC: score per entry
+    SC--&gt;&gt;CG: BrandCandidate with SimilaritySignals
+    CG--&gt;&gt;CH: top 5 same-script
+
+    CH-&gt;&gt;XG: generate
+    XG-&gt;&gt;IDX: transliteration, skeleton and phonetic key lookups
+    IDX--&gt;&gt;XG: cross-script pool
+    XG-&gt;&gt;SC: scoreCrossLanguage / scoreHebrewExpansion / scorePhonetic
+    SC--&gt;&gt;XG: BrandCandidate with CrossLanguageSignals
+    XG-&gt;&gt;XG: isCredibleCrossLanguageMatch
+    XG--&gt;&gt;CH: credible cross-script candidates
+
+    CH-&gt;&gt;CH: mergeCandidates and withCrossLanguageCandidates
+    CH-&gt;&gt;DE: decide candidates
+    DE--&gt;&gt;CH: decision and confidence
+
+    CH--&gt;&gt;CLI: BrandCheckResult
+
+    CLI-&gt;&gt;CLI: formatBrandCheckResult
+    CLI--&gt;&gt;U: readable report on stderr
+    CLI--&gt;&gt;U: ALLOW / REVIEW report written to .txt and .csv</pre></div>
+  </details>
+</section>
+
+<!-- ============ DECISION TABLE ============ -->
+<section id="table">
+  <h2>Decision table</h2>
+  <p class="sec-note">Every condition that can change a decision, in evaluation order. Thresholds are the shipped defaults from <code>brand-matching-config.ts</code>.</p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Step</th><th>Condition</th><th>Result</th><th>Next step</th><th>Code location</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="num">1</td>
+          <td><code>NORMALIZED_EXACT</code> &amp;&amp; score ≥ <span class="num">1.0</span></td>
+          <td><span class="badge b-block">Duplicate</span> conf = score</td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:31<br>exactBlockThreshold</td>
+        </tr>
+        <tr>
+          <td class="num">2</td>
+          <td><code>COMPACT_EXACT</code> &amp;&amp; score ≥ <span class="num">1.0</span> — score is fixed 0.97, never true</td>
+          <td><span class="badge b-inferred">Unreachable</span></td>
+          <td>step 3</td>
+          <td class="mono">decision-engine.ts:36<br>compactExactBlockThreshold</td>
+        </tr>
+        <tr>
+          <td class="num">3</td>
+          <td><code>TRANSLITERATION_EXACT</code> &amp;&amp; <code>transliterationExact</code> &amp;&amp; source <code>CURATED</code> &amp;&amp; score ≥ <span class="num">0.98</span></td>
+          <td><span class="badge b-block">Duplicate</span></td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:41<br>transliterationExactBlockThreshold</td>
+        </tr>
+        <tr>
+          <td class="num">4</td>
+          <td><code>APPROVED_ALIAS</code> present — no threshold</td>
+          <td><span class="badge b-block">Duplicate</span> <span class="badge b-not">Not wired</span></td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:54</td>
+        </tr>
+        <tr>
+          <td class="num">5</td>
+          <td>candidates.length === 0</td>
+          <td><span class="badge b-allow">New</span> conf = 1</td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:59</td>
+        </tr>
+        <tr>
+          <td class="num">6</td>
+          <td><code>HIGH_FUZZY</code> &amp;&amp; editDistance === 1 &amp;&amp; score ≥ <span class="num">0.80</span> &amp;&amp; equal token counts &amp;&amp; !isPrefixVariant &amp;&amp; both lengths &gt; 3 &amp;&amp; min length ≥ 6</td>
+          <td><span class="badge b-block">Duplicate</span></td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:64, 376<br>strongFuzzyBlockThreshold<br>strongFuzzyMinLength</td>
+        </tr>
+        <tr>
+          <td class="num">6b</td>
+          <td>min length ≤ <span class="num">3</span> → threshold becomes <span class="num">1.01</span>, above any possible score</td>
+          <td>never blocks</td>
+          <td>step 7</td>
+          <td class="mono">shortNameMaxLength 3<br>shortNameFuzzyBlockThreshold 1.01</td>
+        </tr>
+        <tr>
+          <td class="num">5·</td>
+          <td><code>partialMatch</code> (the input adds words, or one word differs entirely), or a cross-script spelling match with no pronunciation, skeleton or exact confirmation</td>
+          <td>skipped for gates 5–7</td>
+          <td>next candidate</td>
+          <td class="mono">decision-engine.ts · string-similarity.ts isPartialNameMatch()</td>
+        </tr>
+        <tr>
+          <td class="num">7a</td>
+          <td>strongest type is <code>COMPACT_EXACT</code> or <code>RELATED_NAME</code></td>
+          <td><span class="badge b-review">Review</span></td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:92</td>
+        </tr>
+        <tr>
+          <td class="num">7b</td>
+          <td>any candidate carries convincing <code>crossLanguageSignals</code>: exact, or skeleton ≥ <span class="num">5</span>, or a pronunciation match with similarity ≥ <span class="num">0.72</span></td>
+          <td><span class="badge b-review">Review</span></td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:82, 321<br>crossLanguageEvidenceThreshold<br>skeletonEvidenceMinimumLength</td>
+        </tr>
+        <tr>
+          <td class="num">7c</td>
+          <td>strongest score ≥ <span class="num">0.68</span></td>
+          <td><span class="badge b-review">Review</span> conf = max(strongest, evidence)</td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:96<br>reviewThreshold</td>
+        </tr>
+        <tr>
+          <td class="num">7d</td>
+          <td>otherwise</td>
+          <td><span class="badge b-allow">New</span> conf = 1 − strongest score</td>
+          <td>return</td>
+          <td class="mono">decision-engine.ts:104</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h3>Scoring constants that feed those gates</h3>
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Constant</th><th>Value</th><th>What it governs</th><th>Location</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>NORMALIZED_EXACT</code> score</td><td class="num">1.00</td><td>Fixed, not computed</td><td class="mono">brand-candidate-scorer.ts:62</td></tr>
+        <tr><td><code>COMPACT_EXACT</code> score</td><td class="num">0.97</td><td>Fixed, not computed</td><td class="mono">brand-candidate-scorer.ts:68</td></tr>
+        <tr><td>Token-prefix bonus</td><td class="num">+0.22</td><td>Added to <code>RELATED_NAME</code>, capped at 1</td><td class="mono">brand-candidate-scorer.ts:76</td></tr>
+        <tr><td>Cross-script exact score</td><td class="num">0.8 + 0.19·conf</td><td>0.99 for curated, ≤ 0.9425 for generated</td><td class="mono">brand-candidate-scorer.ts:115, 195</td></tr>
+        <tr><td>Cross-script fuzzy score</td><td class="num">sim · (0.7 + 0.3·conf)</td><td>Discounts speculative spellings</td><td class="mono">brand-candidate-scorer.ts:116</td></tr>
+        <tr><td>Generated variant confidence</td><td class="num">max(0.2, 0.75 − 0.16·cost)</td><td>Caps every generated reading below curated</td><td class="mono">transliteration-service.ts:171</td></tr>
+        <tr><td><code>SKELETON_FLOOR_SCORE</code></td><td class="num">0.78</td><td>Lifts a shared-consonant pair into review range, never into blocking range</td><td class="mono">brand-candidate-scorer.ts:20</td></tr>
+        <tr><td><code>SKELETON_SCORE_MINIMUM_LENGTH</code></td><td class="num">4</td><td>82% of 2-letter skeletons are ambiguous, 61% of 3-letter, only 26% of 4-letter</td><td class="mono">brand-candidate-scorer.ts:33</td></tr>
+        <tr><td><code>PHONETIC_SCORE_SCALE</code></td><td class="num">0.95</td><td>Ceiling for a pairing confirmed by sound</td><td class="mono">brand-candidate-scorer.ts:38</td></tr>
+        <tr><td><code>TRANSLITERATION_FUZZY</code> cutoff</td><td class="num">0.72</td><td>Below it the type becomes <code>CROSS_LANGUAGE_POSSIBLE_MATCH</code></td><td class="mono">brand-candidate-scorer.ts:128, 206</td></tr>
+        <tr><td>Phonetic minimum similarity</td><td class="num">0.88 / 0.87 / 0.82</td><td>By consonant count: ≤2, 3, 4+</td><td class="mono">cross-script-phonetic-matcher.ts:67</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============ COMPONENTS ============ -->
+<section id="components">
+  <h2>Component &amp; file map</h2>
+  <p class="sec-note">Every module under <code>src/brand-duplicate/</code>, grouped by the layer it belongs to. Dashed cards exist but are not constructed by <code>brand-cli.ts</code>.</p>
+
+  <div class="layers">
+    <div class="layer">
+      <div class="layer-h">Entry &amp; orchestration</div>
+      <div class="mods">
+        <div class="mod"><div class="mod-n">brand-cli.ts</div><div class="mod-d">Process entry. Loads the catalogue, takes brand names from arguments, <code>--input</code>, or stdin, writes the diagnostic summary to stderr, writes the ALLOW / REVIEW report to a .txt and a .csv, and stops cleanly on SIGINT / SIGTERM. Nothing goes to stdout.</div></div>
+        <div class="mod"><div class="mod-n">brand-duplicate-checker.ts</div><div class="mod-d">The orchestrator. <code>checkBrand()</code>, plus candidate merging and reserved-slot logic.</div></div>
+        <div class="mod"><div class="mod-n">index.ts</div><div class="mod-d">Public barrel — every class, function and type the package exposes.</div></div>
+        <div class="mod"><div class="mod-n">brand-result-formatter.ts</div><div class="mod-d">Renders a <code>BrandCheckResult</code> as a human-readable block, relabelling confidence as “margin” on ALLOW.</div></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-h">Data &amp; indexing</div>
+      <div class="mods">
+        <div class="mod"><div class="mod-n">brand-adapter.ts</div><div class="mod-d">Parses the values-list API payload into <code>Brand[]</code>, dropping malformed entries.</div></div>
+        <div class="mod"><div class="mod-n">brand-index.ts</div><div class="mod-d">Twelve posting-list maps over labels and translations, including romanization, consonant skeleton and phonetic keys.</div></div>
+        <div class="mod"><div class="mod-n">brand-normalizer.ts</div><div class="mod-d">The single normalization function both indexing and querying go through.</div></div>
+        <div class="mod"><div class="mod-n">script-detection.ts</div><div class="mod-d">Classifies a string as HEBREW, LATIN, MIXED, NUMERIC_OR_SYMBOL or OTHER.</div></div>
+        <div class="mod"><div class="mod-n">types.ts</div><div class="mod-d">Every shared interface and union — decisions, candidates, signals.</div></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-h">Candidate generation &amp; scoring</div>
+      <div class="mods">
+        <div class="mod"><div class="mod-n">candidate-generator.ts</div><div class="mod-d">Same-script weighted retrieval and shortlisting.</div></div>
+        <div class="mod"><div class="mod-n">cross-language-candidate-generator.ts</div><div class="mod-d">Hebrew↔Latin retrieval across three sub-paths, plus the credibility filter.</div></div>
+        <div class="mod"><div class="mod-n">brand-candidate-scorer.ts</div><div class="mod-d">Four scoring entry points — same-script, romanized, Hebrew-expanded and phonetic — and match-type classification.</div></div>
+        <div class="mod"><div class="mod-n">string-similarity.ts</div><div class="mod-d">Damerau-Levenshtein with a reused scratch matrix, bigram and token similarity, the full signal set, and <code>isPartialNameMatch()</code> for names that share only some words.</div></div>
+        <div class="mod"><div class="mod-n">keyboard-typos.ts</div><div class="mod-d">Hebrew and QWERTY key positions and sound-alike letter groups, deciding whether a one-letter replacement is a plausible typo.</div></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-h">Cross-script machinery</div>
+      <div class="mods">
+        <div class="mod"><div class="mod-n">transliteration-service.ts</div><div class="mod-d">Hebrew→Latin beam expansion, the curated mappings, acronym letter names read back as letters, and <code>toConsonantSkeleton()</code>.</div></div>
+        <div class="mod"><div class="mod-n">latin-to-hebrew-transliteration.ts</div><div class="mod-d">Latin→Hebrew beam expansion with longest-unit matching, soft/hard c and g, English suffix rules, curated spellings and acronyms spelled as Hebrew letter names.</div></div>
+        <div class="mod"><div class="mod-n">brand-overrides.ts</div><div class="mod-d">Loads <code>data/phonetic-transliteration-rules.json</code>: verified brand pairs for both directions (generic words and placeholders excluded) and the Hebrew names of Latin letters.</div></div>
+        <div class="mod"><div class="mod-n">cross-script-phonetic-matcher.ts</div><div class="mod-d">Word-by-word pairing by sound, the coverage and vowel evidence rules, and phonetic retrieval keys.</div></div>
+        <div class="mod"><div class="mod-n">phonetic-aligner.ts</div><div class="mod-d">The weighted edit alignment itself, with a full tally of what each difference was.</div></div>
+        <div class="mod"><div class="mod-n">phonetic-alphabet.ts</div><div class="mod-d">The shared sound classes and every cost the matcher uses.</div></div>
+        <div class="mod"><div class="mod-n">hebrew-phonetic-units.ts</div><div class="mod-d">Hebrew letters and digraphs mapped to the readings they can stand for.</div></div>
+        <div class="mod"><div class="mod-n">latin-phonetic-readings.ts</div><div class="mod-d">Latin names read by English, French, Italian, German and literal orthographies.</div></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-h">Decision &amp; configuration</div>
+      <div class="mods">
+        <div class="mod"><div class="mod-n">decision-engine.ts</div><div class="mod-d">All ordered gates.</div></div>
+        <div class="mod"><div class="mod-n">brand-matching-config.ts</div><div class="mod-d">14 deterministic thresholds with the reasoning recorded beside each.</div></div>
+      </div>
+    </div>
+
+    <div class="layer">
+      <div class="layer-h">Present but not wired into the CLI</div>
+      <div class="mods">
+        <div class="mod muted"><div class="mod-n">brand-alias-resolver.ts</div><div class="mod-d">In-memory approved-alias lookup. Constructed only in tests.</div></div>
+        <div class="mod muted"><div class="mod-n">decision-engine.ts → applyDecision()</div><div class="mod-d">Exported from its module but not from <code>index.ts</code>, and referenced nowhere. Dead code.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ EXAMPLES ============ -->
+<section id="examples">
+  <h2>Example execution</h2>
+  <p class="sec-note">
+    Real output captured by piping each name into <code>node dist/brand-duplicate/brand-cli.js</code>
+    against the full 17,653-value catalogue. Not illustrative — these are verbatim runs, re-captured
+    on 2026-09-28 after the local reranker was removed.
+  </p>
+
+  <div class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" aria-selected="true" data-t="t1">Adiddas → DUPLICATE</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="t2"><span class="he">אדידס</span> → DUPLICATE</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="t3">Versalli → REVIEW</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="t4"><span class="he">ברברי</span> → REVIEW</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="t5">Garniera → REVIEW</button>
+    <button class="tab" role="tab" aria-selected="false" data-t="t6"><span class="he">גוצי</span> → DUPLICATE</button>
+  </div>
+
+  <div class="trace" id="t1" role="tabpanel">
+    <div class="trace-head">
+      <span class="trace-in">Adiddas</span>
+      <span class="badge b-block">Duplicate</span>
+      <span class="trace-path">gate 6 — safe strong typo</span>
+    </div>
+    <div class="trace-steps">
+      <div class="tstep"><div class="tstep-k">Normalized</div><div class="tstep-v mono">adiddas</div></div>
+      <div class="tstep"><div class="tstep-k">Top candidate</div><div class="tstep-v">Adidas</div><div class="tstep-sub">b_3453 · HIGH_FUZZY</div></div>
+      <div class="tstep"><div class="tstep-k">Signals</div><div class="tstep-v">score 0.86</div><div class="tstep-sub">edit distance 1 · 1 token each<br>lengths 7 / 6</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 6</div><div class="tstep-v">all conditions hold</div><div class="tstep-sub">0.86 ≥ 0.80 · min len 6 ≥ 6</div></div>
+      <div class="tstep final f-block"><div class="tstep-k">Decision</div><div class="tstep-v">BLOCK · 86%</div></div>
+    </div>
+    <div class="trace-out"><pre>Brand check
+  Input: Adiddas
+  Normalized: adiddas
+  Decision: BLOCK
+  Confidence: 86%
+  Candidates:
+  1. Adidas (b_3453)
+     Score: 86% | Match: HIGH_FUZZY
+     Reason: One-character insertion or deletion compared with the existing normalized brand
+  2. אדידס קוסמטיקה (b_2296)
+     Score: 79% | Match: CROSS_LANGUAGE_POSSIBLE_MATCH
+     Reason: LATIN input shares a word pronounced like the HEBREW brand name and adds or omits
+             another; the extra word may identify a distinct product line
+  3. Addis (b_7121mp)      Score: 58% | Match: TOKEN_VARIANT
+  4. AVIDAN (b_13257mp)    Score: 50% | Match: TOKEN_VARIANT
+  5. Addict (b_3245)       Score: 48% | Match: WEAK_SIMILARITY</pre></div>
+  </div>
+
+  <div class="trace" id="t2" role="tabpanel" hidden>
+    <div class="trace-head">
+      <span class="trace-in he">אדידס</span>
+      <span class="badge b-block">Duplicate</span>
+      <span class="trace-path">gate 3 — curated transliteration</span>
+    </div>
+    <div class="trace-steps">
+      <div class="tstep"><div class="tstep-k">Script</div><div class="tstep-v">HEBREW</div><div class="tstep-sub">detectScript()</div></div>
+      <div class="tstep"><div class="tstep-k">Romanized</div><div class="tstep-v mono">adidas</div><div class="tstep-sub">curated entry · confidence 1</div></div>
+      <div class="tstep"><div class="tstep-k">Top candidate</div><div class="tstep-v">Adidas</div><div class="tstep-sub">b_3453 · TRANSLITERATION_EXACT</div></div>
+      <div class="tstep"><div class="tstep-k">Score</div><div class="tstep-v">0.8 + 0.19×1 = 0.99</div><div class="tstep-sub">≥ 0.98 and source CURATED</div></div>
+      <div class="tstep final f-block"><div class="tstep-k">Decision</div><div class="tstep-v">BLOCK · 99%</div></div>
+    </div>
+    <div class="trace-out"><pre>Brand check
+  Input: אדידס
+  Normalized: אדידס
+  Decision: BLOCK
+  Confidence: 99%
+  Candidates:
+  1. Adidas (b_3453)
+     Score: 99% | Match: TRANSLITERATION_EXACT
+     Reason: HEBREW input transliterates to the normalized LATIN brand name (adidas)
+  2. אדיס (b_11804mp)          Score: 73% | Match: POSSIBLE_TYPO
+  3. Addis (b_7121mp)          Score: 70% | Match: CROSS_LANGUAGE_POSSIBLE_MATCH
+  4. Addo (b_6520mp)           Score: 68% | Match: TRANSLITERATION_FUZZY
+  5. אדידס קוסמטיקה (b_2296)   Score: 68% | Match: RELATED_NAME</pre></div>
+  </div>
+
+  <div class="trace" id="t3" role="tabpanel" hidden>
+    <div class="trace-head">
+      <span class="trace-in">Versalli</span>
+      <span class="badge b-review">Review</span>
+      <span class="trace-path">gate 7 — strongest score ≥ 0.68</span>
+    </div>
+    <div class="trace-steps">
+      <div class="tstep"><div class="tstep-k">Top candidate</div><div class="tstep-v">VERSAL</div><div class="tstep-sub">b_15730mp · TOKEN_VARIANT</div></div>
+      <div class="tstep"><div class="tstep-k">Score</div><div class="tstep-v">0.79</div><div class="tstep-sub">edit distance 2</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 6</div><div class="tstep-v">not a safe typo</div><div class="tstep-sub">TOKEN_VARIANT, not HIGH_FUZZY</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 7</div><div class="tstep-v">0.79 ≥ 0.68</div><div class="tstep-sub">review threshold met</div></div>
+      <div class="tstep final f-review"><div class="tstep-k">Decision</div><div class="tstep-v">HUMAN_REVIEW · 79%</div></div>
+    </div>
+    <div class="trace-out"><pre>Brand check
+  Input: Versalli
+  Normalized: versalli
+  Decision: HUMAN_REVIEW
+  Confidence: 79%
+  Action: a person must confirm or reject this name.
+  Candidates:
+  1. VERSAL (b_15730mp)
+     Score: 79% | Match: TOKEN_VARIANT
+     Reason: 2-character edit distance with overlapping character and token signals
+  2. VERSACE (b_104)       Score: 64% | Match: TOKEN_VARIANT
+  3. Versace (b_4680)      Score: 64% | Match: TOKEN_VARIANT
+  4. VersaSpa (b_6795mp)   Score: 63% | Match: TOKEN_VARIANT
+  5. VERS (b_10059mp)      Score: 56% | Match: TOKEN_VARIANT</pre></div>
+    <div style="padding:13px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)">
+      The removed reranker used to clear this name as NEW. Without it, coincidental same-script overlap above 0.68 stays at review.
+    </div>
+  </div>
+
+  <div class="trace" id="t4" role="tabpanel" hidden>
+    <div class="trace-head">
+      <span class="trace-in he">ברברי</span>
+      <span class="badge b-review">Review</span>
+      <span class="trace-path">phonetic match · gate 7</span>
+    </div>
+    <div class="trace-steps">
+      <div class="tstep"><div class="tstep-k">Matched by</div><div class="tstep-v">sound, not spelling</div><div class="tstep-sub">read as English → berberi</div></div>
+      <div class="tstep"><div class="tstep-k">Top candidate</div><div class="tstep-v">BURBERRY</div><div class="tstep-sub">b_2294 · TRANSLITERATION_FUZZY · 0.91</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 3</div><div class="tstep-v">does not apply</div><div class="tstep-sub">not a curated pair; phonetic matches are never exact</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 7</div><div class="tstep-v">convincing evidence</div><div class="tstep-sub">confirmed by pronunciation</div></div>
+      <div class="tstep final f-review"><div class="tstep-k">Decision</div><div class="tstep-v">HUMAN_REVIEW · 91%</div></div>
+    </div>
+    <div class="trace-out"><pre>Brand check
+  Input: ברברי
+  Decision: HUMAN_REVIEW
+  Confidence: 91%
+  Action: a person must confirm or reject this name.
+  Candidates:
+  1. BURBERRY (b_2294)
+     Score: 91% | Match: TRANSLITERATION_FUZZY
+     Reason: HEBREW input is pronounced like the LATIN brand name (berberi, read as English)
+  2. Bravery (b_6994mp)    Score: 91% | Match: TRANSLITERATION_FUZZY
+  3. ברבריס (b_1283)       Score: 85% | Match: HIGH_FUZZY
+  4. ברבריא (b_2491)       Score: 85% | Match: HIGH_FUZZY
+  5. BARBERO (b_13274mp)   Score: 84% | Match: CROSS_LANGUAGE_POSSIBLE_MATCH</pre></div>
+  </div>
+
+  <div class="trace" id="t5" role="tabpanel" hidden>
+    <div class="trace-head">
+      <span class="trace-in">Garniera</span>
+      <span class="badge b-review">Review</span>
+      <span class="trace-path">gate 6 fails on the prefix rule · gate 7</span>
+    </div>
+    <div class="trace-steps">
+      <div class="tstep"><div class="tstep-k">Top candidate</div><div class="tstep-v">GARNIER</div><div class="tstep-sub">b_3945 · HIGH_FUZZY · 0.90</div></div>
+      <div class="tstep"><div class="tstep-k">Signals</div><div class="tstep-v">edit distance 1</div><div class="tstep-sub">lengths 8 / 7</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 6</div><div class="tstep-v">prefix variant</div><div class="tstep-sub">garnier is a prefix of garniera → not a safe typo</div></div>
+      <div class="tstep"><div class="tstep-k">Gate 7</div><div class="tstep-v">0.90 ≥ 0.68</div><div class="tstep-sub">review threshold met</div></div>
+      <div class="tstep final f-review"><div class="tstep-k">Decision</div><div class="tstep-v">HUMAN_REVIEW · 90%</div></div>
+    </div>
+    <div class="trace-out"><pre>Brand check
+  Input: Garniera
+  Normalized: garniera
+  Decision: HUMAN_REVIEW
+  Confidence: 90%
+  Action: a person must confirm or reject this name.
+  Candidates:
+  1. GARNIER (b_3945)
+     Score: 90% | Match: HIGH_FUZZY
+     Reason: One-character insertion or deletion compared with the existing normalized brand
+  2. GARNIER OLIA (b_1706)       Score: 68% | Match: POSSIBLE_TYPO
+  3. GARNIER BIO (b_5784)        Score: 67% | Match: POSSIBLE_TYPO
+  4. GARDENA (b_10915mp)         Score: 53% | Match: TOKEN_VARIANT
+  5. GRAND MARNIER (b_13748mp)   Score: 52% | Match: WEAK_SIMILARITY</pre></div>
+  </div>
+
+  <div class="trace" id="t6" role="tabpanel" hidden>
+    <div class="trace-head">
+      <span class="trace-in he">גוצי</span>
+      <span class="badge b-block">Duplicate</span>
+      <span class="trace-path">gate 3 — curated pair from the data file</span>
+    </div>
+    <div class="trace-steps">
+      <div class="tstep"><div class="tstep-k">Data file</div><div class="tstep-v">gucci = גוצ׳י</div><div class="tstep-sub">filed without the geresh, so גוצי matches too</div></div>
+      <div class="tstep"><div class="tstep-k">Source</div><div class="tstep-v">CURATED</div><div class="tstep-sub">confidence 1</div></div>
+      <div class="tstep"><div class="tstep-k">Score</div><div class="tstep-v">0.8 + 0.19×1 = 0.99</div><div class="tstep-sub">≥ 0.98</div></div>
+      <div class="tstep final f-block"><div class="tstep-k">Decision</div><div class="tstep-v">BLOCK · 99%</div></div>
+    </div>
+    <div class="trace-out"><pre>Brand check
+  Input: גוצי
+  Decision: BLOCK
+  Confidence: 99%
+  Candidates:
+  1. GUCCI (b_4480)
+     Score: 99% | Match: TRANSLITERATION_EXACT
+     Reason: HEBREW input transliterates to the normalized LATIN brand name (gucci)
+  2. GUCCI (b_72)           Score: 99% | Match: TRANSLITERATION_EXACT
+  3. GC (b_9859mp)          Score: 88% | Match: TRANSLITERATION_EXACT
+  4. GUCCI BAMBO (b_2770)   Score: 75% | Match: CROSS_LANGUAGE_POSSIBLE_MATCH
+  5. GUCCI BLOOM (b_2795)   Score: 75% | Match: CROSS_LANGUAGE_POSSIBLE_MATCH</pre></div>
+    <div style="padding:13px 16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)">
+      Before the data file was loaded this was a generated spelling at 88% and stopped at review. GC at
+      88% is still generated, which is why it cannot block.
+    </div>
+  </div>
+</section>
+
+<!-- ============ OBSERVATIONS ============ -->
+<section id="observations">
+  <h2>Observations &amp; potential issues</h2>
+  <p class="sec-note">
+    Documented, not fixed. Nothing above was reshaped to hide any of these. Severity marks the left
+    edge: red affects decisions, amber affects correctness of reporting or configuration, grey is
+    hygiene.
+  </p>
+
+  <div class="obs">
+
+    <div class="ob sev-high">
+      <div class="ob-head"><span class="ob-n">01</span><span class="ob-title">Only curated cross-script matches can BLOCK</span></div>
+      <p>
+        Gate 3 requires <code>source === "CURATED"</code> <em>and</em> score ≥ 0.98. A generated exact
+        transliteration scores <code>0.8 + 0.19 × confidence</code>, and generated confidence caps at
+        <code>0.75</code>, giving a hard ceiling of <span class="num">0.9425</span>. The two conditions
+        are independently sufficient to close the gate. That leaves <b>curated pairs</b> — 7 hand-written in <code>commonBrandRepresentations</code> and the
+        verified brand pairs in <code>data/phonetic-transliteration-rules.json</code> — as the only inputs
+        that can produce a deterministic cross-script block.
+      </p>
+      <p>
+        The consequence is structural: outside the curated pairs, <code>scoreHebrewExpansion()</code> emits
+        <code>source: "GENERATED"</code>, and <code>scorePhonetic()</code> always sets
+        <code>transliterationExact: false</code> — so the entire Latin→Hebrew direction and the entire
+        phonetic path are capped at <span class="badge b-review">Review</span> by construction,
+        however strong the evidence.
+      </p>
+      <div class="ob-ev">
+        <b>Verified by running the CLI (2026-09-28)</b>
+        <span class="he">גוצי</span> and <span class="he">טומי הילפיגר</span> (curated in the data file) → 99% → BLOCK.
+        <span class="he">ברברי</span> → BURBERRY by pronunciation at 91% → HUMAN_REVIEW.
+      </div>
+      <div class="ob-src">decision-engine.ts:41–52 · brand-candidate-scorer.ts:115, 195, 265 · transliteration-service.ts:79–88, 171</div>
+    </div>
+
+    <div class="ob sev-med">
+      <div class="ob-head"><span class="ob-n">02</span><span class="ob-title">Decisions carry no reason code</span></div>
+      <p>
+        <code>DecisionEngine.decide()</code> returns only <code>{decision, confidence}</code>. A
+        consumer can see <code>BLOCK</code> but not which gate produced it.
+      </p>
+      <div class="ob-ev">
+        <b>Verified</b>
+        <code>Object.hasOwnProperty(checkBrand('Dream Baby'), 'decisionReason')</code> → <code>false</code>.
+      </div>
+      <div class="ob-src">decision-engine.ts · DecisionOutcome</div>
+    </div>
+
+    <div class="ob sev-med">
+      <div class="ob-head"><span class="ob-n">03</span><span class="ob-title">Two gates encode “never” as an unreachable number</span></div>
+      <p>
+        <code>compactExactBlockThreshold: 1</code> is compared against a score hard-coded to
+        <code>0.97</code>, and <code>shortNameFuzzyBlockThreshold: 1.01</code> sits above the maximum
+        score any candidate can reach. Both behaviours are intentional and the comments say so, but
+        each is written as a tunable threshold when it is really a disabled branch. Any value in
+        <code>(0.97, 1]</code> behaves identically for the first; lowering the second below 1.0 silently
+        turns on short-name fuzzy blocking.
+      </p>
+      <div class="ob-ev">
+        <b>Verified</b>
+        An index holding only <code>Dreambaby</code>, queried with <code>Dream Baby</code>, returns
+        <code>HUMAN_REVIEW</code> at confidence 0.97 with a <code>COMPACT_EXACT</code> top candidate.
+      </div>
+      <div class="ob-src">brand-matching-config.ts:24, 38 · brand-candidate-scorer.ts:68 · decision-engine.ts:36, 382</div>
+    </div>
+
+    <div class="ob sev-med">
+      <div class="ob-head"><span class="ob-n">04</span><span class="ob-title"><code>confidence</code> carries two different quantities</span></div>
+      <p>
+        On <code>BLOCK</code> and <code>HUMAN_REVIEW</code> it is a match score; on <code>ALLOW</code> it
+        is headroom below the threshold, where a <em>small</em> number means a <em>close call</em>. The
+        formatter relabels it for humans, but the raw <code>confidence</code> field — what any programmatic consumer would read —
+        does not. Any consumer that sorts or thresholds on <code>confidence</code> across mixed decisions
+        will read it backwards for allows.
+      </p>
+      <div class="ob-src">types.ts:170 · decision-engine.ts:104, 280–284 · brand-result-formatter.ts:52–54</div>
+    </div>
+
+    <div class="ob sev-low">
+      <div class="ob-head"><span class="ob-n">05</span><span class="ob-title">The approved-alias gate is unreachable in the shipped CLI</span></div>
+      <p>
+        <code>brand-cli.ts</code> constructs the checker without an <code>aliasResolver</code>, so gate 4
+        (approved alias) never runs outside tests. This is a wiring gap, not dead code: the resolver is
+        fully implemented and covered by <code>brand-duplicate-phase3.test.ts</code>.
+      </p>
+      <div class="ob-src">brand-cli.ts · brand-alias-resolver.ts</div>
+    </div>
+
+    <div class="ob sev-low">
+      <div class="ob-head"><span class="ob-n">06</span><span class="ob-title"><code>applyDecision()</code> is dead code</span></div>
+      <p>
+        Exported from <code>decision-engine.ts</code> but not re-exported by <code>index.ts</code>, and
+        referenced by no module or test. It duplicates the result-assembly that
+        <code>checkBrand()</code> performs inline — including the missing reason code of
+        observation 2.
+      </p>
+      <div class="ob-src">decision-engine.ts:404–418</div>
+    </div>
+
+    <div class="ob sev-low">
+      <div class="ob-head"><span class="ob-n">07</span><span class="ob-title">There is no brand-creation path in this repository <span class="badge b-inferred">Inferred</span></span></div>
+      <p>
+        The brief asks about “blocking or allowing brand creation”. No such step exists here: the project
+        contains no HTTP server, no client, and no write path — a search for
+        <code>express</code>, <code>createServer</code>, <code>fetch(</code> and <code>app.listen</code>
+        across <code>src/</code> returns nothing outside tests. The checker <em>returns</em> a decision;
+        acting on it belongs to a caller that is not in this codebase.
+      </p>
+      <p>
+        <b>Inferred, not implemented:</b> the CSV report is the closest thing to an integration contract,
+        but it is shaped for a person opening it in Excel rather than for a program. Nothing in the
+        repository confirms a downstream consumer, and the CLI no longer writes anything to stdout.
+      </p>
+      <div class="ob-src">brand-cli.ts:51–53 · no service layer found under src/</div>
+    </div>
+
+    <div class="ob sev-low">
+      <div class="ob-head"><span class="ob-n">08</span><span class="ob-title">Stale notes in <code>brand to check.txt</code></span></div>
+      <p>
+        The working notes record “<span class="he">טומי הילפיגר</span> decision is ALLOW with 0.37
+        confidence” and “<span class="he">דאון טאון</span> is allow”. Both now return
+        <code>HUMAN_REVIEW</code> — at 99% and 89% respectively — so those entries describe behaviour
+        that has since changed. Worth clearing so the file is not read as a current bug list.
+      </p>
+      <div class="ob-src">brand to check.txt · verified against the current build 2026-09-23</div>
+    </div>
+
+  </div>
+
+  <h3>What could not be determined</h3>
+  <p style="font-size:13.5px;color:var(--ink-2)">
+    One thing is genuinely unclear from the code alone: whether the <code>en-he</code> translation suite encodes the intended target
+    behaviour (English spellings of Hebrew brands <em>should</em> block) or an aspiration the thresholds
+    were deliberately set against. Observation 1 shows that only brands in the curated pairs can satisfy it
+    by blocking; everything else stops at review.
+  </p>
+</section>
+
+<p class="footnote">
+  Built by reading <code>src/brand-duplicate/</code> at the state of 2026-09-23, updated on 2026-09-28 when the local
+  reranker and the LLM judge were removed. Line numbers refer to the 2026-09-23 state and may have shifted. Every trace under “Example execution” was produced by
+  <code>node dist/brand-duplicate/brand-cli.js</code> against the full catalogue; claims marked “Verified” were reproduced directly, everything else was read from source.
+  Nothing on this page describes intended or proposed behaviour.
+</p>
+
+</div>
+
+<script>
+(function () {
+  var tabs = document.querySelectorAll('#tabs .tab');
+  function show(id) {
+    tabs.forEach(function (t) {
+      var on = t.dataset.t === id;
+      t.setAttribute('aria-selected', on ? 'true' : 'false');
+      var panel = document.getElementById(t.dataset.t);
+      if (panel) panel.hidden = !on;
+    });
+  }
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { show(t.dataset.t); });
+  });
+})();
+</script>

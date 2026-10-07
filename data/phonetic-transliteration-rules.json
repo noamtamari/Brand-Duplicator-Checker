@@ -1,0 +1,5280 @@
+{
+  "schema_version": "1.0.0",
+  "generated_on": "2026-09-23",
+  "name": "Hebrew-English phonetic transliteration candidate rules for brand matching",
+  "purpose": "Generate and rank phonetic candidates in both directions for duplicate-brand detection.",
+  "important_limitations": [
+    "This is a candidate-generation ruleset, not a dictionary or a deterministic translator.",
+    "Unpointed Hebrew omits most vowels, so one Hebrew spelling can have multiple valid Latin readings.",
+    "English spelling is not phonemic and brand names may originate in languages other than English.",
+    "The two directions are intentionally not exact inverses.",
+    "A verified brand override or source-language pronunciation must outrank generic grapheme rules.",
+    "No finite static table can cover every possible proper name; unknown cases should remain REVIEW candidates."
+  ],
+  "language_tags": {
+    "recommended_hebrew_bcp47": "he",
+    "legacy_hebrew_tag_supported_by_project": "iw",
+    "english": "en"
+  },
+  "recommended_pipeline": [
+    "Unicode NFKC normalization",
+    "case-fold Latin text",
+    "normalize apostrophes, geresh/gershayim, dashes and whitespace",
+    "apply exact lexical/brand overrides",
+    "detect likely source language when Latin spelling is not English",
+    "apply longest grapheme or marked-letter rules before single-letter rules",
+    "generate several weighted candidates instead of one irreversible output",
+    "compare normalized original, transliteration candidates and phonetic skeletons",
+    "send uncertain high-similarity cases to REVIEW"
+  ],
+  "normalization": {
+    "unicode_form": "NFKC",
+    "strip_hebrew_cantillation_for_search": true,
+    "keep_niqqud_until_phonetic_analysis": true,
+    "casefold_latin": true,
+    "collapse_whitespace": true,
+    "separator_equivalences": [
+      {
+        "group": [
+          " ",
+          "-",
+          "‐",
+          "‑",
+          "–",
+          "—",
+          "_",
+          ""
+        ],
+        "notes": "word-boundary/compound variants"
+      },
+      {
+        "group": [
+          "'",
+          "’",
+          "׳",
+          "`",
+          ""
+        ],
+        "notes": "apostrophe/geresh variants"
+      },
+      {
+        "group": [
+          "\"",
+          "״",
+          "''"
+        ],
+        "notes": "quotation/gershayim variants"
+      },
+      {
+        "group": [
+          "&",
+          "+",
+          "and",
+          "ו"
+        ],
+        "notes": "brand conjunction variants; do not apply blindly inside words"
+      }
+    ],
+    "final_hebrew_forms": {
+      "ך": "כ",
+      "ם": "מ",
+      "ן": "נ",
+      "ף": "פ",
+      "ץ": "צ"
+    },
+    "latin_diacritic_expansions": {
+      "áàâäãåāăą": [
+        "a"
+      ],
+      "æ": [
+        "ae",
+        "e"
+      ],
+      "çćč": [
+        "c",
+        "s",
+        "ch",
+        "ts"
+      ],
+      "ďđð": [
+        "d",
+        "dh",
+        "th"
+      ],
+      "éèêëēĕėęě": [
+        "e"
+      ],
+      "ğģġ": [
+        "g",
+        "gh",
+        "y"
+      ],
+      "íìîïīĭįı": [
+        "i"
+      ],
+      "ł": [
+        "l",
+        "w"
+      ],
+      "ñńň": [
+        "n",
+        "ny"
+      ],
+      "óòôöõøōő": [
+        "o"
+      ],
+      "œ": [
+        "oe",
+        "e"
+      ],
+      "ř": [
+        "r",
+        "rz"
+      ],
+      "śšşș": [
+        "s",
+        "sh"
+      ],
+      "ß": [
+        "ss",
+        "s"
+      ],
+      "ťţțþ": [
+        "t",
+        "th"
+      ],
+      "úùûüūŭůűų": [
+        "u",
+        "ue",
+        "y"
+      ],
+      "ýÿ": [
+        "y",
+        "i"
+      ],
+      "źżž": [
+        "z",
+        "zh"
+      ]
+    }
+  },
+  "hebrew_to_english": {
+    "precedence": [
+      "brand_overrides",
+      "pointed/marked multi-character sequences",
+      "niqqud",
+      "unpointed common sequences",
+      "base letters",
+      "contextual vowel candidate generation"
+    ],
+    "base_letters": [
+      {
+        "source": [
+          "א",
+          "אָלֶף"
+        ],
+        "preferred": "a",
+        "alternatives": [
+          "",
+          "'",
+          "e",
+          "i",
+          "o",
+          "u"
+        ],
+        "context": "usually vocalic; often omitted in simplified romanization",
+        "notes": "Unpointed alef does not identify its vowel."
+      },
+      {
+        "source": [
+          "בּ"
+        ],
+        "preferred": "b",
+        "alternatives": [],
+        "context": "bet with dagesh"
+      },
+      {
+        "source": [
+          "ב",
+          "בֿ"
+        ],
+        "preferred": "v",
+        "alternatives": [
+          "b"
+        ],
+        "context": "bet without dagesh; unpointed ב is ambiguous"
+      },
+      {
+        "source": [
+          "ג"
+        ],
+        "preferred": "g",
+        "alternatives": [],
+        "context": "native Hebrew sound"
+      },
+      {
+        "source": [
+          "ד"
+        ],
+        "preferred": "d",
+        "alternatives": [],
+        "context": "native Hebrew sound"
+      },
+      {
+        "source": [
+          "ה"
+        ],
+        "preferred": "h",
+        "alternatives": [
+          "a",
+          "ah",
+          "",
+          "e"
+        ],
+        "context": "h initially/medially; often a/ah or silent finally"
+      },
+      {
+        "source": [
+          "ו"
+        ],
+        "preferred": "v",
+        "alternatives": [
+          "w",
+          "o",
+          "u",
+          "oo"
+        ],
+        "context": "consonant v/w or mater lectionis o/u; unpointed form is ambiguous"
+      },
+      {
+        "source": [
+          "ז"
+        ],
+        "preferred": "z",
+        "alternatives": [],
+        "context": "any"
+      },
+      {
+        "source": [
+          "ח"
+        ],
+        "preferred": "kh",
+        "alternatives": [
+          "h",
+          "ch",
+          "x",
+          "ẖ",
+          "ḥ"
+        ],
+        "context": "modern Israeli /χ/; h/ch occur in conventional spellings"
+      },
+      {
+        "source": [
+          "ט"
+        ],
+        "preferred": "t",
+        "alternatives": [],
+        "context": "any"
+      },
+      {
+        "source": [
+          "י"
+        ],
+        "preferred": "y",
+        "alternatives": [
+          "i",
+          "ee",
+          "e",
+          "ai",
+          "ay"
+        ],
+        "context": "consonant y or mater lectionis, especially i"
+      },
+      {
+        "source": [
+          "כּ",
+          "ךּ"
+        ],
+        "preferred": "k",
+        "alternatives": [
+          "c",
+          "q"
+        ],
+        "context": "kaf with dagesh"
+      },
+      {
+        "source": [
+          "כ",
+          "ך",
+          "כֿ"
+        ],
+        "preferred": "kh",
+        "alternatives": [
+          "ch",
+          "h",
+          "x",
+          "k"
+        ],
+        "context": "khaf without dagesh; unpointed כ is ambiguous"
+      },
+      {
+        "source": [
+          "ל"
+        ],
+        "preferred": "l",
+        "alternatives": [],
+        "context": "any"
+      },
+      {
+        "source": [
+          "מ",
+          "ם"
+        ],
+        "preferred": "m",
+        "alternatives": [],
+        "context": "any"
+      },
+      {
+        "source": [
+          "נ",
+          "ן"
+        ],
+        "preferred": "n",
+        "alternatives": [],
+        "context": "any"
+      },
+      {
+        "source": [
+          "ס"
+        ],
+        "preferred": "s",
+        "alternatives": [
+          "c"
+        ],
+        "context": "any"
+      },
+      {
+        "source": [
+          "ע"
+        ],
+        "preferred": "",
+        "alternatives": [
+          "a",
+          "e",
+          "i",
+          "o",
+          "u",
+          "'",
+          "‘",
+          "ʿ"
+        ],
+        "context": "usually silent or glottal/pharyngeal marker; may carry any vowel"
+      },
+      {
+        "source": [
+          "פּ"
+        ],
+        "preferred": "p",
+        "alternatives": [],
+        "context": "pe with dagesh"
+      },
+      {
+        "source": [
+          "פ",
+          "ף",
+          "פֿ"
+        ],
+        "preferred": "f",
+        "alternatives": [
+          "ph",
+          "p"
+        ],
+        "context": "fe without dagesh; unpointed פ is ambiguous"
+      },
+      {
+        "source": [
+          "צ",
+          "ץ"
+        ],
+        "preferred": "ts",
+        "alternatives": [
+          "tz",
+          "z",
+          "c"
+        ],
+        "context": "any"
+      },
+      {
+        "source": [
+          "ק"
+        ],
+        "preferred": "k",
+        "alternatives": [
+          "q",
+          "c",
+          "ck"
+        ],
+        "context": "simplified phonetic romanization"
+      },
+      {
+        "source": [
+          "ר"
+        ],
+        "preferred": "r",
+        "alternatives": [],
+        "context": "any"
+      },
+      {
+        "source": [
+          "שׁ",
+          "ש"
+        ],
+        "preferred": "sh",
+        "alternatives": [
+          "s",
+          "sch"
+        ],
+        "context": "shin; unpointed ש can also be sin"
+      },
+      {
+        "source": [
+          "שׂ"
+        ],
+        "preferred": "s",
+        "alternatives": [
+          "sh"
+        ],
+        "context": "sin dot"
+      },
+      {
+        "source": [
+          "ת"
+        ],
+        "preferred": "t",
+        "alternatives": [
+          "th",
+          "s"
+        ],
+        "context": "modern Hebrew t; th/s occur in historical or conventional spellings"
+      }
+    ],
+    "foreign_marked_letters": [
+      {
+        "source": [
+          "ג׳",
+          "ג'"
+        ],
+        "preferred": "j",
+        "alternatives": [
+          "g",
+          "dj",
+          "dzh",
+          "ǧ"
+        ],
+        "context": "/dʒ/ as in jazz"
+      },
+      {
+        "source": [
+          "ז׳",
+          "ז'"
+        ],
+        "preferred": "zh",
+        "alternatives": [
+          "j",
+          "g",
+          "ž"
+        ],
+        "context": "/ʒ/ as in vision/French j"
+      },
+      {
+        "source": [
+          "צ׳",
+          "צ'"
+        ],
+        "preferred": "ch",
+        "alternatives": [
+          "tch",
+          "č"
+        ],
+        "context": "/tʃ/ as in chair"
+      },
+      {
+        "source": [
+          "ד׳",
+          "ד'"
+        ],
+        "preferred": "dh",
+        "alternatives": [
+          "d",
+          "th"
+        ],
+        "context": "Arabic or precise foreign-name notation"
+      },
+      {
+        "source": [
+          "ת׳",
+          "ת'"
+        ],
+        "preferred": "th",
+        "alternatives": [
+          "t"
+        ],
+        "context": "Arabic or precise foreign-name notation"
+      },
+      {
+        "source": [
+          "ח׳",
+          "ח'"
+        ],
+        "preferred": "kh",
+        "alternatives": [
+          "x",
+          "ch",
+          "ḥ"
+        ],
+        "context": "Arabic/foreign notation"
+      },
+      {
+        "source": [
+          "ע׳",
+          "ע'"
+        ],
+        "preferred": "gh",
+        "alternatives": [
+          "g",
+          "r",
+          "ġ"
+        ],
+        "context": "Arabic/foreign notation"
+      },
+      {
+        "source": [
+          "ר׳",
+          "ר'"
+        ],
+        "preferred": "r",
+        "alternatives": [
+          "rh"
+        ],
+        "context": "rare foreign notation"
+      }
+    ],
+    "niqqud_and_vowel_sequences": [
+      {
+        "source": [
+          "ְ"
+        ],
+        "preferred": "e",
+        "alternatives": [
+          "",
+          "ə"
+        ],
+        "context": "shva na is e; shva nah is omitted"
+      },
+      {
+        "source": [
+          "ֱ"
+        ],
+        "preferred": "e",
+        "alternatives": [
+          "ĕ"
+        ],
+        "context": "hataf segol"
+      },
+      {
+        "source": [
+          "ֲ"
+        ],
+        "preferred": "a",
+        "alternatives": [
+          "ă"
+        ],
+        "context": "hataf patah"
+      },
+      {
+        "source": [
+          "ֳ"
+        ],
+        "preferred": "o",
+        "alternatives": [
+          "ŏ"
+        ],
+        "context": "hataf qamats"
+      },
+      {
+        "source": [
+          "ִ"
+        ],
+        "preferred": "i",
+        "alternatives": [
+          "ee"
+        ],
+        "context": "hiriq"
+      },
+      {
+        "source": [
+          "ֵ"
+        ],
+        "preferred": "e",
+        "alternatives": [
+          "ei",
+          "ey"
+        ],
+        "context": "tsere; modern pronunciation usually e"
+      },
+      {
+        "source": [
+          "ֶ"
+        ],
+        "preferred": "e",
+        "alternatives": [],
+        "context": "segol"
+      },
+      {
+        "source": [
+          "ַ"
+        ],
+        "preferred": "a",
+        "alternatives": [],
+        "context": "patah"
+      },
+      {
+        "source": [
+          "ָ"
+        ],
+        "preferred": "a",
+        "alternatives": [
+          "o"
+        ],
+        "context": "qamats; qamats qatan is o"
+      },
+      {
+        "source": [
+          "ֹ"
+        ],
+        "preferred": "o",
+        "alternatives": [],
+        "context": "holam"
+      },
+      {
+        "source": [
+          "ֻ"
+        ],
+        "preferred": "u",
+        "alternatives": [
+          "oo"
+        ],
+        "context": "qubuts"
+      },
+      {
+        "source": [
+          "וּ"
+        ],
+        "preferred": "u",
+        "alternatives": [
+          "oo"
+        ],
+        "context": "shuruq"
+      },
+      {
+        "source": [
+          "וֹ"
+        ],
+        "preferred": "o",
+        "alternatives": [],
+        "context": "holam male"
+      },
+      {
+        "source": [
+          "ַי"
+        ],
+        "preferred": "ai",
+        "alternatives": [
+          "ay"
+        ],
+        "context": "common diphthong"
+      },
+      {
+        "source": [
+          "ֵי"
+        ],
+        "preferred": "ei",
+        "alternatives": [
+          "ey",
+          "e"
+        ],
+        "context": "common tsere-yod sequence"
+      },
+      {
+        "source": [
+          "וֹי"
+        ],
+        "preferred": "oi",
+        "alternatives": [
+          "oy"
+        ],
+        "context": "common diphthong"
+      }
+    ],
+    "unpointed_sequences": [
+      {
+        "source": [
+          "וו"
+        ],
+        "preferred": "v",
+        "alternatives": [
+          "w",
+          "vv"
+        ],
+        "context": "usually consonantal v/w in full spelling"
+      },
+      {
+        "source": [
+          "יי"
+        ],
+        "preferred": "y",
+        "alternatives": [
+          "yy",
+          "ai",
+          "ay",
+          "ei",
+          "ey"
+        ],
+        "context": "consonantal y or diphthong"
+      },
+      {
+        "source": [
+          "או"
+        ],
+        "preferred": "o",
+        "alternatives": [
+          "u",
+          "au",
+          "aw",
+          "av"
+        ],
+        "context": "vocalic sequence; context required"
+      },
+      {
+        "source": [
+          "אי"
+        ],
+        "preferred": "i",
+        "alternatives": [
+          "ee",
+          "ai",
+          "ay",
+          "ei",
+          "ey",
+          "e"
+        ],
+        "context": "vocalic sequence; context required"
+      },
+      {
+        "source": [
+          "עו"
+        ],
+        "preferred": "o",
+        "alternatives": [
+          "u",
+          "av"
+        ],
+        "context": "vocalic sequence; context required"
+      },
+      {
+        "source": [
+          "עי"
+        ],
+        "preferred": "i",
+        "alternatives": [
+          "ee",
+          "ai",
+          "ay",
+          "ei",
+          "ey"
+        ],
+        "context": "vocalic sequence; context required"
+      },
+      {
+        "source": [
+          "יה"
+        ],
+        "preferred": "ya",
+        "alternatives": [
+          "ia",
+          "iya",
+          "ye",
+          "yah"
+        ],
+        "context": "usually word-final or suffix-like"
+      },
+      {
+        "source": [
+          "יות"
+        ],
+        "preferred": "iyot",
+        "alternatives": [
+          "yot"
+        ],
+        "context": "common plural/feminine sequence"
+      },
+      {
+        "source": [
+          "ים"
+        ],
+        "preferred": "im",
+        "alternatives": [
+          "yim",
+          "aim",
+          "ayim"
+        ],
+        "context": "masculine plural or dual ending"
+      },
+      {
+        "source": [
+          "ות"
+        ],
+        "preferred": "ot",
+        "alternatives": [
+          "ut"
+        ],
+        "context": "common feminine plural ending"
+      },
+      {
+        "source": [
+          "ון"
+        ],
+        "preferred": "on",
+        "alternatives": [
+          "un"
+        ],
+        "context": "common suffix"
+      },
+      {
+        "source": [
+          "יק"
+        ],
+        "preferred": "ik",
+        "alternatives": [
+          "ic",
+          "ique"
+        ],
+        "context": "common borrowed-name ending"
+      },
+      {
+        "source": [
+          "יהו"
+        ],
+        "preferred": "yahu",
+        "alternatives": [
+          "yehu",
+          "iahu"
+        ],
+        "context": "common Hebrew theophoric sequence"
+      }
+    ],
+    "optional_morphological_prefixes": [
+      {
+        "source": [
+          "ה"
+        ],
+        "preferred": "ha",
+        "alternatives": [
+          "he"
+        ],
+        "context": "definite article; only when morphologically identified"
+      },
+      {
+        "source": [
+          "ו"
+        ],
+        "preferred": "ve",
+        "alternatives": [
+          "va",
+          "vi",
+          "vo",
+          "u"
+        ],
+        "context": "conjunction prefix; pronunciation depends on context"
+      },
+      {
+        "source": [
+          "ב"
+        ],
+        "preferred": "be",
+        "alternatives": [
+          "ba",
+          "bi"
+        ],
+        "context": "preposition prefix; pronunciation depends on context"
+      },
+      {
+        "source": [
+          "כ"
+        ],
+        "preferred": "ke",
+        "alternatives": [
+          "ka",
+          "ki"
+        ],
+        "context": "preposition prefix; pronunciation depends on context"
+      },
+      {
+        "source": [
+          "ל"
+        ],
+        "preferred": "le",
+        "alternatives": [
+          "la",
+          "li"
+        ],
+        "context": "preposition prefix; pronunciation depends on context"
+      },
+      {
+        "source": [
+          "מ"
+        ],
+        "preferred": "mi",
+        "alternatives": [
+          "me"
+        ],
+        "context": "preposition prefix; pronunciation depends on context"
+      }
+    ],
+    "unpointed_vowel_candidates": [
+      "a",
+      "e",
+      "i",
+      "o",
+      "u",
+      ""
+    ],
+    "search_only_equivalences": {
+      "kh_ch_h_x": [
+        "kh",
+        "ch",
+        "h",
+        "x",
+        "ẖ",
+        "ḥ"
+      ],
+      "ts_tz": [
+        "ts",
+        "tz"
+      ],
+      "sh_sch": [
+        "sh",
+        "sch"
+      ],
+      "j_dj_dzh": [
+        "j",
+        "dj",
+        "dzh",
+        "ǧ"
+      ],
+      "zh_j_g": [
+        "zh",
+        "j",
+        "g",
+        "ž"
+      ],
+      "k_q_c_ck": [
+        "k",
+        "q",
+        "c",
+        "ck"
+      ],
+      "v_w": [
+        "v",
+        "w"
+      ],
+      "ai_ay": [
+        "ai",
+        "ay"
+      ],
+      "ei_ey": [
+        "ei",
+        "ey"
+      ],
+      "oi_oy": [
+        "oi",
+        "oy"
+      ],
+      "u_oo": [
+        "u",
+        "oo"
+      ]
+    }
+  },
+  "english_to_hebrew": {
+    "precedence": [
+      "brand_overrides",
+      "source-language hints",
+      "phoneme mapping when pronunciation is available",
+      "longest grapheme patterns",
+      "single-letter fallback"
+    ],
+    "phoneme_to_hebrew": [
+      {
+        "source": [
+          "/b/"
+        ],
+        "preferred": "ב",
+        "alternatives": [
+          "בּ"
+        ],
+        "context": "any",
+        "notes": "b"
+      },
+      {
+        "source": [
+          "/v/"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "ב"
+        ],
+        "context": "any",
+        "notes": "v"
+      },
+      {
+        "source": [
+          "/w/"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "וו"
+        ],
+        "context": "any",
+        "notes": "English w; doubled vav may improve readability"
+      },
+      {
+        "source": [
+          "/p/"
+        ],
+        "preferred": "פ",
+        "alternatives": [
+          "פּ"
+        ],
+        "context": "any",
+        "notes": "p"
+      },
+      {
+        "source": [
+          "/f/"
+        ],
+        "preferred": "פ",
+        "alternatives": [
+          "ף",
+          "פֿ"
+        ],
+        "context": "any",
+        "notes": "f; final form at word end"
+      },
+      {
+        "source": [
+          "/m/"
+        ],
+        "preferred": "מ",
+        "alternatives": [
+          "ם"
+        ],
+        "context": "any",
+        "notes": "m; final form at word end"
+      },
+      {
+        "source": [
+          "/n/"
+        ],
+        "preferred": "נ",
+        "alternatives": [
+          "ן"
+        ],
+        "context": "any",
+        "notes": "n; final form at word end"
+      },
+      {
+        "source": [
+          "/ŋ/"
+        ],
+        "preferred": "נג",
+        "alternatives": [
+          "נ"
+        ],
+        "context": "any",
+        "notes": "ng as in sing"
+      },
+      {
+        "source": [
+          "/t/"
+        ],
+        "preferred": "ט",
+        "alternatives": [
+          "ת"
+        ],
+        "context": "any",
+        "notes": "foreign names usually ט; established spellings may use ת"
+      },
+      {
+        "source": [
+          "/d/"
+        ],
+        "preferred": "ד",
+        "alternatives": [],
+        "context": "any",
+        "notes": "d"
+      },
+      {
+        "source": [
+          "/k/"
+        ],
+        "preferred": "ק",
+        "alternatives": [
+          "כ",
+          "כּ"
+        ],
+        "context": "any",
+        "notes": "k/c/ck/q"
+      },
+      {
+        "source": [
+          "/g/"
+        ],
+        "preferred": "ג",
+        "alternatives": [],
+        "context": "any",
+        "notes": "hard g"
+      },
+      {
+        "source": [
+          "/ts/"
+        ],
+        "preferred": "צ",
+        "alternatives": [
+          "ץ"
+        ],
+        "context": "any",
+        "notes": "ts/z in some European languages"
+      },
+      {
+        "source": [
+          "/tʃ/"
+        ],
+        "preferred": "צ׳",
+        "alternatives": [
+          "צ'"
+        ],
+        "context": "any",
+        "notes": "ch/tch"
+      },
+      {
+        "source": [
+          "/dʒ/"
+        ],
+        "preferred": "ג׳",
+        "alternatives": [
+          "ג'"
+        ],
+        "context": "any",
+        "notes": "j/soft g"
+      },
+      {
+        "source": [
+          "/s/"
+        ],
+        "preferred": "ס",
+        "alternatives": [
+          "שׂ"
+        ],
+        "context": "any",
+        "notes": "s/soft c"
+      },
+      {
+        "source": [
+          "/z/"
+        ],
+        "preferred": "ז",
+        "alternatives": [],
+        "context": "any",
+        "notes": "z or voiced s"
+      },
+      {
+        "source": [
+          "/ʃ/"
+        ],
+        "preferred": "ש",
+        "alternatives": [],
+        "context": "any",
+        "notes": "sh; also French ch and German sch"
+      },
+      {
+        "source": [
+          "/ʒ/"
+        ],
+        "preferred": "ז׳",
+        "alternatives": [
+          "ז'"
+        ],
+        "context": "any",
+        "notes": "French j or s in vision"
+      },
+      {
+        "source": [
+          "/θ/"
+        ],
+        "preferred": "ת",
+        "alternatives": [
+          "ט"
+        ],
+        "context": "any",
+        "notes": "voiceless th"
+      },
+      {
+        "source": [
+          "/ð/"
+        ],
+        "preferred": "ד",
+        "alternatives": [
+          "ת"
+        ],
+        "context": "any",
+        "notes": "voiced th"
+      },
+      {
+        "source": [
+          "/x/"
+        ],
+        "preferred": "כ",
+        "alternatives": [
+          "ח"
+        ],
+        "context": "any",
+        "notes": "German/Spanish/Slavic guttural sound"
+      },
+      {
+        "source": [
+          "/h/"
+        ],
+        "preferred": "ה",
+        "alternatives": [
+          "ח"
+        ],
+        "context": "any",
+        "notes": "h"
+      },
+      {
+        "source": [
+          "/l/"
+        ],
+        "preferred": "ל",
+        "alternatives": [],
+        "context": "any",
+        "notes": "l"
+      },
+      {
+        "source": [
+          "/r/"
+        ],
+        "preferred": "ר",
+        "alternatives": [],
+        "context": "any",
+        "notes": "English/European r variants"
+      },
+      {
+        "source": [
+          "/j/"
+        ],
+        "preferred": "י",
+        "alternatives": [],
+        "context": "any",
+        "notes": "consonantal y"
+      },
+      {
+        "source": [
+          "/a/"
+        ],
+        "preferred": "א",
+        "alternatives": [
+          "",
+          "ה"
+        ],
+        "context": "any",
+        "notes": "a; alef may be omitted medially, he often word-final"
+      },
+      {
+        "source": [
+          "/æ/"
+        ],
+        "preferred": "א",
+        "alternatives": [
+          "",
+          "אַ"
+        ],
+        "context": "any",
+        "notes": "English trap vowel"
+      },
+      {
+        "source": [
+          "/e/"
+        ],
+        "preferred": "א",
+        "alternatives": [
+          "",
+          "י"
+        ],
+        "context": "any",
+        "notes": "short/close e; often not marked medially"
+      },
+      {
+        "source": [
+          "/i/"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "אי"
+        ],
+        "context": "any",
+        "notes": "i/ee"
+      },
+      {
+        "source": [
+          "/o/"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או"
+        ],
+        "context": "any",
+        "notes": "o"
+      },
+      {
+        "source": [
+          "/u/"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או"
+        ],
+        "context": "any",
+        "notes": "u/oo"
+      },
+      {
+        "source": [
+          "/ə/"
+        ],
+        "preferred": "",
+        "alternatives": [
+          "א",
+          "ה"
+        ],
+        "context": "any",
+        "notes": "schwa is often omitted"
+      },
+      {
+        "source": [
+          "/aɪ/"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "אי",
+          "יי"
+        ],
+        "context": "any",
+        "notes": "eye/ai/ay/igh"
+      },
+      {
+        "source": [
+          "/eɪ/"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "אי",
+          "יי",
+          "ֵי"
+        ],
+        "context": "any",
+        "notes": "long a"
+      },
+      {
+        "source": [
+          "/ɔɪ/"
+        ],
+        "preferred": "וי",
+        "alternatives": [
+          "אוי",
+          "ויי"
+        ],
+        "context": "any",
+        "notes": "oi/oy"
+      },
+      {
+        "source": [
+          "/aʊ/"
+        ],
+        "preferred": "או",
+        "alternatives": [
+          "אאוו"
+        ],
+        "context": "any",
+        "notes": "ou/ow"
+      },
+      {
+        "source": [
+          "/oʊ/"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או",
+          "ואו"
+        ],
+        "context": "any",
+        "notes": "long o"
+      },
+      {
+        "source": [
+          "/ɪə/"
+        ],
+        "preferred": "יר",
+        "alternatives": [
+          "איר"
+        ],
+        "context": "any",
+        "notes": "near/ear, accent-dependent"
+      },
+      {
+        "source": [
+          "/eə/"
+        ],
+        "preferred": "אר",
+        "alternatives": [
+          "איר"
+        ],
+        "context": "any",
+        "notes": "air, accent-dependent"
+      }
+    ],
+    "grapheme_patterns": [
+      {
+        "source": [
+          "a"
+        ],
+        "preferred": "א",
+        "alternatives": [
+          "",
+          "ה"
+        ],
+        "context": "sound may be /æ/, /ɑː/, /eɪ/ or schwa"
+      },
+      {
+        "source": [
+          "e"
+        ],
+        "preferred": "א",
+        "alternatives": [
+          "",
+          "י"
+        ],
+        "context": "sound may be /e/, /iː/, /ɜː/ or silent"
+      },
+      {
+        "source": [
+          "i"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "אי",
+          "איי"
+        ],
+        "context": "sound may be /ɪ/, /iː/ or /aɪ/"
+      },
+      {
+        "source": [
+          "o"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או"
+        ],
+        "context": "sound may be /ɒ/, /oʊ/, /ʌ/ or /uː/"
+      },
+      {
+        "source": [
+          "u"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "יו",
+          "א",
+          ""
+        ],
+        "context": "sound may be /ʌ/, /uː/, /juː/ or schwa"
+      },
+      {
+        "source": [
+          "y"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "יי",
+          "איי"
+        ],
+        "context": "consonant /j/ or vowel /i,aɪ/"
+      },
+      {
+        "source": [
+          "b",
+          "bb"
+        ],
+        "preferred": "ב",
+        "alternatives": [],
+        "context": "usually /b/"
+      },
+      {
+        "source": [
+          "d",
+          "dd"
+        ],
+        "preferred": "ד",
+        "alternatives": [],
+        "context": "usually /d/"
+      },
+      {
+        "source": [
+          "f",
+          "ff"
+        ],
+        "preferred": "פ",
+        "alternatives": [],
+        "context": "usually /f/"
+      },
+      {
+        "source": [
+          "h"
+        ],
+        "preferred": "ה",
+        "alternatives": [
+          ""
+        ],
+        "context": "may be silent in French and some English names"
+      },
+      {
+        "source": [
+          "j"
+        ],
+        "preferred": "ג׳",
+        "alternatives": [
+          "י",
+          "ז׳",
+          "ח"
+        ],
+        "context": "language dependent: English/French-German-Spanish"
+      },
+      {
+        "source": [
+          "k",
+          "ck"
+        ],
+        "preferred": "ק",
+        "alternatives": [
+          "כ"
+        ],
+        "context": "/k/"
+      },
+      {
+        "source": [
+          "l",
+          "ll"
+        ],
+        "preferred": "ל",
+        "alternatives": [
+          "י"
+        ],
+        "context": "ll is /l/ in English, often /j/ in Spanish"
+      },
+      {
+        "source": [
+          "m",
+          "mm"
+        ],
+        "preferred": "מ",
+        "alternatives": [],
+        "context": "/m/"
+      },
+      {
+        "source": [
+          "n",
+          "nn"
+        ],
+        "preferred": "נ",
+        "alternatives": [],
+        "context": "/n/"
+      },
+      {
+        "source": [
+          "p",
+          "pp"
+        ],
+        "preferred": "פ",
+        "alternatives": [],
+        "context": "/p/"
+      },
+      {
+        "source": [
+          "r",
+          "rr"
+        ],
+        "preferred": "ר",
+        "alternatives": [],
+        "context": "/r/; may color a preceding vowel in English"
+      },
+      {
+        "source": [
+          "s",
+          "ss"
+        ],
+        "preferred": "ס",
+        "alternatives": [
+          "ז",
+          "ש",
+          "ז׳"
+        ],
+        "context": "usually /s/; /z/, /ʃ/, /ʒ/ by word/context"
+      },
+      {
+        "source": [
+          "t",
+          "tt"
+        ],
+        "preferred": "ט",
+        "alternatives": [
+          "ת"
+        ],
+        "context": "usually /t/"
+      },
+      {
+        "source": [
+          "v"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "ב",
+          "פ"
+        ],
+        "context": "usually /v/; German v may be /f/"
+      },
+      {
+        "source": [
+          "w"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "וו"
+        ],
+        "context": "English /w/; German/Polish w is /v/"
+      },
+      {
+        "source": [
+          "x"
+        ],
+        "preferred": "קס",
+        "alternatives": [
+          "גז",
+          "ז",
+          "ש"
+        ],
+        "context": "/ks/, /gz/; initial x can be /z/ or Chinese /ɕ/"
+      },
+      {
+        "source": [
+          "z",
+          "zz"
+        ],
+        "preferred": "ז",
+        "alternatives": [
+          "צ",
+          "דז"
+        ],
+        "context": "/z/; German/Italian z may be /ts,dz/"
+      },
+      {
+        "source": [
+          "c"
+        ],
+        "preferred": "ק",
+        "alternatives": [
+          "ס",
+          "צ׳",
+          "צ"
+        ],
+        "context": "hard before a/o/u; soft before e/i/y; language dependent"
+      },
+      {
+        "source": [
+          "g"
+        ],
+        "preferred": "ג",
+        "alternatives": [
+          "ג׳",
+          "ז׳",
+          "ח"
+        ],
+        "context": "hard or soft; language dependent"
+      },
+      {
+        "source": [
+          "q"
+        ],
+        "preferred": "ק",
+        "alternatives": [
+          "כ"
+        ],
+        "context": "usually followed by u in English"
+      },
+      {
+        "source": [
+          "ch"
+        ],
+        "preferred": "צ׳",
+        "alternatives": [
+          "ש",
+          "כ",
+          "ק",
+          "ח"
+        ],
+        "context": "English/French/German-Greek-origin ambiguity"
+      },
+      {
+        "source": [
+          "sh"
+        ],
+        "preferred": "ש",
+        "alternatives": [],
+        "context": "/ʃ/"
+      },
+      {
+        "source": [
+          "sch"
+        ],
+        "preferred": "ש",
+        "alternatives": [
+          "סק",
+          "שק"
+        ],
+        "context": "German /ʃ/; English/Greek-origin may differ"
+      },
+      {
+        "source": [
+          "tch"
+        ],
+        "preferred": "צ׳",
+        "alternatives": [],
+        "context": "/tʃ/"
+      },
+      {
+        "source": [
+          "dge"
+        ],
+        "preferred": "ג׳",
+        "alternatives": [],
+        "context": "/dʒ/"
+      },
+      {
+        "source": [
+          "dj"
+        ],
+        "preferred": "ג׳",
+        "alternatives": [
+          "דז׳"
+        ],
+        "context": "/dʒ/"
+      },
+      {
+        "source": [
+          "zh"
+        ],
+        "preferred": "ז׳",
+        "alternatives": [],
+        "context": "/ʒ/"
+      },
+      {
+        "source": [
+          "th"
+        ],
+        "preferred": "ת",
+        "alternatives": [
+          "ד",
+          "ט"
+        ],
+        "context": "/θ/, /ð/, or /t/; determine from pronunciation"
+      },
+      {
+        "source": [
+          "ph"
+        ],
+        "preferred": "פ",
+        "alternatives": [],
+        "context": "usually /f/"
+      },
+      {
+        "source": [
+          "gh"
+        ],
+        "preferred": "ג",
+        "alternatives": [
+          "",
+          "פ",
+          "ח"
+        ],
+        "context": "hard g, silent, /f/, or guttural depending on language"
+      },
+      {
+        "source": [
+          "kh"
+        ],
+        "preferred": "כ",
+        "alternatives": [
+          "ח"
+        ],
+        "context": "/x/"
+      },
+      {
+        "source": [
+          "ng"
+        ],
+        "preferred": "נג",
+        "alternatives": [
+          "נ"
+        ],
+        "context": "/ŋ/ or /ŋg/"
+      },
+      {
+        "source": [
+          "nk"
+        ],
+        "preferred": "נק",
+        "alternatives": [
+          "נגק"
+        ],
+        "context": "/ŋk/"
+      },
+      {
+        "source": [
+          "qu"
+        ],
+        "preferred": "קוו",
+        "alternatives": [
+          "קו",
+          "ק"
+        ],
+        "context": "/kw/ or /k/"
+      },
+      {
+        "source": [
+          "wh"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "וו",
+          "הוו"
+        ],
+        "context": "/w/ or /hw/"
+      },
+      {
+        "source": [
+          "wr"
+        ],
+        "preferred": "ר",
+        "alternatives": [],
+        "context": "word-initial w is usually silent in English"
+      },
+      {
+        "source": [
+          "kn"
+        ],
+        "preferred": "נ",
+        "alternatives": [],
+        "context": "word-initial k is usually silent in English"
+      },
+      {
+        "source": [
+          "gn"
+        ],
+        "preferred": "נ",
+        "alternatives": [
+          "ני"
+        ],
+        "context": "initial English /n/; French/Italian /ɲ/"
+      },
+      {
+        "source": [
+          "ps"
+        ],
+        "preferred": "ס",
+        "alternatives": [
+          "פס"
+        ],
+        "context": "word-initial p may be silent in Greek-origin English"
+      },
+      {
+        "source": [
+          "rh"
+        ],
+        "preferred": "ר",
+        "alternatives": [],
+        "context": "initial h is usually silent"
+      },
+      {
+        "source": [
+          "mb"
+        ],
+        "preferred": "מ",
+        "alternatives": [
+          "מב"
+        ],
+        "context": "word-final b often silent in English"
+      },
+      {
+        "source": [
+          "tion"
+        ],
+        "preferred": "שן",
+        "alternatives": [
+          "ציון",
+          "טיון"
+        ],
+        "context": "English /ʃən/; not universal"
+      },
+      {
+        "source": [
+          "sion"
+        ],
+        "preferred": "ז׳ן",
+        "alternatives": [
+          "שן",
+          "סיון"
+        ],
+        "context": "English /ʒən/ or /ʃən/"
+      },
+      {
+        "source": [
+          "cian"
+        ],
+        "preferred": "שן",
+        "alternatives": [],
+        "context": "English /ʃən/"
+      },
+      {
+        "source": [
+          "ture"
+        ],
+        "preferred": "צ׳ר",
+        "alternatives": [
+          "טור",
+          "טיור"
+        ],
+        "context": "English /tʃər/ or /tjʊə/"
+      },
+      {
+        "source": [
+          "sure"
+        ],
+        "preferred": "ז׳ר",
+        "alternatives": [
+          "שור"
+        ],
+        "context": "English /ʒər/ or /ʃʊə/"
+      },
+      {
+        "source": [
+          "ough"
+        ],
+        "preferred": "או",
+        "alternatives": [
+          "ו",
+          "אף",
+          "אוף",
+          "אוק",
+          ""
+        ],
+        "context": "highly irregular English sequence"
+      },
+      {
+        "source": [
+          "eigh"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "אי"
+        ],
+        "context": "usually /eɪ/"
+      },
+      {
+        "source": [
+          "igh"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "אי"
+        ],
+        "context": "usually /aɪ/"
+      },
+      {
+        "source": [
+          "ee"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "אי"
+        ],
+        "context": "usually /iː/"
+      },
+      {
+        "source": [
+          "ea"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "א",
+          "אי"
+        ],
+        "context": "/iː/, /e/ or /eɪ/"
+      },
+      {
+        "source": [
+          "ie"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "איי",
+          "אי"
+        ],
+        "context": "/iː/ or /aɪ/"
+      },
+      {
+        "source": [
+          "ei"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "י",
+          "אי"
+        ],
+        "context": "/eɪ/, /iː/ or /aɪ/"
+      },
+      {
+        "source": [
+          "ey"
+        ],
+        "preferred": "י",
+        "alternatives": [
+          "איי"
+        ],
+        "context": "/i/ or /eɪ/"
+      },
+      {
+        "source": [
+          "ai"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "אי",
+          "י"
+        ],
+        "context": "usually /eɪ/, sometimes /e/"
+      },
+      {
+        "source": [
+          "ay"
+        ],
+        "preferred": "איי",
+        "alternatives": [
+          "אי"
+        ],
+        "context": "usually /eɪ/"
+      },
+      {
+        "source": [
+          "oo"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או"
+        ],
+        "context": "/uː/ or /ʊ/"
+      },
+      {
+        "source": [
+          "ou"
+        ],
+        "preferred": "או",
+        "alternatives": [
+          "ו",
+          "א",
+          "אוו"
+        ],
+        "context": "/aʊ/, /uː/, /ʌ/, /oʊ/"
+      },
+      {
+        "source": [
+          "ow"
+        ],
+        "preferred": "או",
+        "alternatives": [
+          "ו"
+        ],
+        "context": "/aʊ/ or /oʊ/"
+      },
+      {
+        "source": [
+          "oa"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או"
+        ],
+        "context": "usually /oʊ/"
+      },
+      {
+        "source": [
+          "oe"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "או",
+          "י"
+        ],
+        "context": "usually /oʊ/; Greek-origin may be /i/"
+      },
+      {
+        "source": [
+          "oi"
+        ],
+        "preferred": "וי",
+        "alternatives": [
+          "אוי"
+        ],
+        "context": "usually /ɔɪ/"
+      },
+      {
+        "source": [
+          "oy"
+        ],
+        "preferred": "וי",
+        "alternatives": [
+          "אוי"
+        ],
+        "context": "usually /ɔɪ/"
+      },
+      {
+        "source": [
+          "au"
+        ],
+        "preferred": "או",
+        "alternatives": [
+          "ו",
+          "א"
+        ],
+        "context": "usually /ɔː/ or /oʊ/"
+      },
+      {
+        "source": [
+          "aw"
+        ],
+        "preferred": "או",
+        "alternatives": [
+          "ו"
+        ],
+        "context": "usually /ɔː/"
+      },
+      {
+        "source": [
+          "ue"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "יו",
+          "י"
+        ],
+        "context": "/uː/, /juː/ or silent"
+      },
+      {
+        "source": [
+          "ui"
+        ],
+        "preferred": "ו",
+        "alternatives": [
+          "י",
+          "יו"
+        ],
+        "context": "/uː/, /ɪ/ or /juː/"
+      },
+      {
+        "source": [
+          "ew"
+        ],
+        "preferred": "יו",
+        "alternatives": [
+          "ו"
+        ],
+        "context": "/juː/ or /uː/"
+      },
+      {
+        "source": [
+          "ar"
+        ],
+        "preferred": "אר",
+        "alternatives": [
+          "א",
+          "ר"
+        ],
+        "context": "rhoticity/accent dependent"
+      },
+      {
+        "source": [
+          "er"
+        ],
+        "preferred": "ר",
+        "alternatives": [
+          "אר",
+          "א"
+        ],
+        "context": "/ɜr/ or schwa+r"
+      },
+      {
+        "source": [
+          "ir"
+        ],
+        "preferred": "יר",
+        "alternatives": [
+          "ר"
+        ],
+        "context": "/ɜr/ or /ɪr/"
+      },
+      {
+        "source": [
+          "or"
+        ],
+        "preferred": "ור",
+        "alternatives": [
+          "אור",
+          "ר"
+        ],
+        "context": "accent dependent"
+      },
+      {
+        "source": [
+          "ur"
+        ],
+        "preferred": "ר",
+        "alternatives": [
+          "ור",
+          "אר"
+        ],
+        "context": "accent dependent"
+      },
+      {
+        "source": [
+          "air"
+        ],
+        "preferred": "אר",
+        "alternatives": [
+          "איר"
+        ],
+        "context": "accent dependent"
+      },
+      {
+        "source": [
+          "ear"
+        ],
+        "preferred": "יר",
+        "alternatives": [
+          "אר",
+          "איר"
+        ],
+        "context": "/ɪr/, /ɛr/ or /ɜr/"
+      }
+    ],
+    "source_language_hints": {
+      "english": [
+        {
+          "pattern": "c + e/i/y",
+          "preferred": "ס",
+          "alternatives": [
+            "ק"
+          ]
+        },
+        {
+          "pattern": "g + e/i/y",
+          "preferred": "ג׳",
+          "alternatives": [
+            "ג"
+          ]
+        },
+        {
+          "pattern": "final silent e",
+          "preferred": "",
+          "alternatives": [
+            "א",
+            "י"
+          ]
+        },
+        {
+          "pattern": "s between vowels",
+          "preferred": "ז",
+          "alternatives": [
+            "ס"
+          ]
+        }
+      ],
+      "french": [
+        {
+          "pattern": "ch",
+          "preferred": "ש",
+          "alternatives": [
+            "צ׳"
+          ]
+        },
+        {
+          "pattern": "j; g + e/i/y",
+          "preferred": "ז׳",
+          "alternatives": [
+            "ג׳"
+          ]
+        },
+        {
+          "pattern": "ou",
+          "preferred": "ו",
+          "alternatives": [
+            "או"
+          ]
+        },
+        {
+          "pattern": "oi",
+          "preferred": "ווא",
+          "alternatives": [
+            "ואה",
+            "וי"
+          ]
+        },
+        {
+          "pattern": "eau; au",
+          "preferred": "ו",
+          "alternatives": [
+            "או"
+          ]
+        },
+        {
+          "pattern": "gn",
+          "preferred": "ני",
+          "alternatives": [
+            "נ"
+          ]
+        },
+        {
+          "pattern": "final consonant",
+          "preferred": "",
+          "alternatives": [
+            "literal"
+          ],
+          "notes": "often silent; lexical check required"
+        }
+      ],
+      "german": [
+        {
+          "pattern": "sch",
+          "preferred": "ש",
+          "alternatives": []
+        },
+        {
+          "pattern": "ch",
+          "preferred": "כ",
+          "alternatives": [
+            "ש",
+            "ח"
+          ]
+        },
+        {
+          "pattern": "z",
+          "preferred": "צ",
+          "alternatives": [
+            "ז"
+          ]
+        },
+        {
+          "pattern": "w",
+          "preferred": "ו",
+          "alternatives": [
+            "וו"
+          ]
+        },
+        {
+          "pattern": "v",
+          "preferred": "פ",
+          "alternatives": [
+            "ו"
+          ]
+        },
+        {
+          "pattern": "j",
+          "preferred": "י",
+          "alternatives": [
+            "ג׳"
+          ]
+        },
+        {
+          "pattern": "ei",
+          "preferred": "איי",
+          "alternatives": [
+            "אי"
+          ]
+        },
+        {
+          "pattern": "ie",
+          "preferred": "י",
+          "alternatives": []
+        },
+        {
+          "pattern": "eu; äu",
+          "preferred": "וי",
+          "alternatives": [
+            "אוי"
+          ]
+        },
+        {
+          "pattern": "tsch",
+          "preferred": "צ׳",
+          "alternatives": []
+        },
+        {
+          "pattern": "initial sp; st",
+          "preferred": "שפ; שט",
+          "alternatives": [
+            "ספ; סט"
+          ]
+        },
+        {
+          "pattern": "ß",
+          "preferred": "ס",
+          "alternatives": []
+        }
+      ],
+      "italian": [
+        {
+          "pattern": "c + e/i",
+          "preferred": "צ׳",
+          "alternatives": [
+            "ק"
+          ]
+        },
+        {
+          "pattern": "ch",
+          "preferred": "ק",
+          "alternatives": [
+            "צ׳"
+          ]
+        },
+        {
+          "pattern": "g + e/i",
+          "preferred": "ג׳",
+          "alternatives": [
+            "ג"
+          ]
+        },
+        {
+          "pattern": "gh",
+          "preferred": "ג",
+          "alternatives": []
+        },
+        {
+          "pattern": "gn",
+          "preferred": "ני",
+          "alternatives": [
+            "נ"
+          ]
+        },
+        {
+          "pattern": "gli",
+          "preferred": "לי",
+          "alternatives": [
+            "גלי"
+          ]
+        },
+        {
+          "pattern": "sc + e/i",
+          "preferred": "ש",
+          "alternatives": [
+            "סק"
+          ]
+        },
+        {
+          "pattern": "z",
+          "preferred": "צ",
+          "alternatives": [
+            "דז",
+            "ז"
+          ]
+        }
+      ],
+      "spanish": [
+        {
+          "pattern": "j; g + e/i",
+          "preferred": "ח",
+          "alternatives": [
+            "כ",
+            "ה"
+          ]
+        },
+        {
+          "pattern": "ll; y",
+          "preferred": "י",
+          "alternatives": [
+            "ז׳",
+            "ג׳",
+            "ל"
+          ]
+        },
+        {
+          "pattern": "ñ",
+          "preferred": "ני",
+          "alternatives": [
+            "נ"
+          ]
+        },
+        {
+          "pattern": "ch",
+          "preferred": "צ׳",
+          "alternatives": []
+        },
+        {
+          "pattern": "qu",
+          "preferred": "ק",
+          "alternatives": [
+            "קו"
+          ]
+        },
+        {
+          "pattern": "c + e/i; z",
+          "preferred": "ס",
+          "alternatives": [
+            "ת"
+          ]
+        },
+        {
+          "pattern": "h",
+          "preferred": "",
+          "alternatives": [
+            "ה"
+          ]
+        }
+      ],
+      "portuguese": [
+        {
+          "pattern": "nh",
+          "preferred": "ני",
+          "alternatives": [
+            "נ"
+          ]
+        },
+        {
+          "pattern": "lh",
+          "preferred": "לי",
+          "alternatives": [
+            "ל"
+          ]
+        },
+        {
+          "pattern": "j; g + e/i",
+          "preferred": "ז׳",
+          "alternatives": [
+            "ג׳"
+          ]
+        },
+        {
+          "pattern": "ç",
+          "preferred": "ס",
+          "alternatives": []
+        },
+        {
+          "pattern": "ão",
+          "preferred": "או",
+          "alternatives": [
+            "און"
+          ]
+        }
+      ],
+      "dutch": [
+        {
+          "pattern": "ij",
+          "preferred": "איי",
+          "alternatives": [
+            "אי"
+          ]
+        },
+        {
+          "pattern": "oe",
+          "preferred": "ו",
+          "alternatives": [
+            "או"
+          ]
+        },
+        {
+          "pattern": "ui",
+          "preferred": "אוי",
+          "alternatives": [
+            "וי"
+          ]
+        },
+        {
+          "pattern": "g; ch",
+          "preferred": "כ",
+          "alternatives": [
+            "ח"
+          ]
+        }
+      ],
+      "polish_czech_and_slavic_latin": [
+        {
+          "pattern": "sz; š",
+          "preferred": "ש",
+          "alternatives": []
+        },
+        {
+          "pattern": "cz; č",
+          "preferred": "צ׳",
+          "alternatives": []
+        },
+        {
+          "pattern": "rz; ż; ž",
+          "preferred": "ז׳",
+          "alternatives": [
+            "רז"
+          ]
+        },
+        {
+          "pattern": "c",
+          "preferred": "צ",
+          "alternatives": [
+            "ס",
+            "ק"
+          ]
+        },
+        {
+          "pattern": "j",
+          "preferred": "י",
+          "alternatives": [
+            "ג׳"
+          ]
+        },
+        {
+          "pattern": "w",
+          "preferred": "ו",
+          "alternatives": [
+            "וו"
+          ]
+        },
+        {
+          "pattern": "ł",
+          "preferred": "ו",
+          "alternatives": [
+            "ל"
+          ]
+        },
+        {
+          "pattern": "ch; h",
+          "preferred": "כ",
+          "alternatives": [
+            "ח",
+            "ה"
+          ]
+        }
+      ],
+      "japanese_romanization": [
+        {
+          "pattern": "shi",
+          "preferred": "שי",
+          "alternatives": []
+        },
+        {
+          "pattern": "chi",
+          "preferred": "צ׳י",
+          "alternatives": []
+        },
+        {
+          "pattern": "tsu",
+          "preferred": "צו",
+          "alternatives": []
+        },
+        {
+          "pattern": "fu",
+          "preferred": "פו",
+          "alternatives": [
+            "הו"
+          ]
+        },
+        {
+          "pattern": "ji",
+          "preferred": "ג׳י",
+          "alternatives": []
+        },
+        {
+          "pattern": "r",
+          "preferred": "ר",
+          "alternatives": [
+            "ל"
+          ]
+        }
+      ],
+      "mandarin_pinyin": [
+        {
+          "pattern": "zh",
+          "preferred": "ג׳",
+          "alternatives": [
+            "ז׳"
+          ]
+        },
+        {
+          "pattern": "ch",
+          "preferred": "צ׳",
+          "alternatives": []
+        },
+        {
+          "pattern": "sh",
+          "preferred": "ש",
+          "alternatives": []
+        },
+        {
+          "pattern": "q",
+          "preferred": "צ׳",
+          "alternatives": [
+            "ק"
+          ]
+        },
+        {
+          "pattern": "x",
+          "preferred": "ש",
+          "alternatives": [
+            "ס"
+          ]
+        },
+        {
+          "pattern": "j",
+          "preferred": "ג׳",
+          "alternatives": []
+        },
+        {
+          "pattern": "c",
+          "preferred": "צ",
+          "alternatives": [
+            "ס"
+          ]
+        }
+      ]
+    },
+    "latin_letter_names_for_acronyms": {
+      "A": "איי",
+      "B": "בי",
+      "C": "סי",
+      "D": "די",
+      "E": "אי",
+      "F": "אף",
+      "G": "ג׳י",
+      "H": "אייץ׳",
+      "I": "איי",
+      "J": "ג׳יי",
+      "K": "קיי",
+      "L": "אל",
+      "M": "אם",
+      "N": "אן",
+      "O": "או",
+      "P": "פי",
+      "Q": "קיו",
+      "R": "אר",
+      "S": "אס",
+      "T": "טי",
+      "U": "יו",
+      "V": "וי",
+      "W": "דאבליו",
+      "X": "אקס",
+      "Y": "וואי",
+      "Z": "זי",
+      "Z_US": "זי",
+      "Z_UK": "זד",
+      "H_ALT": "הייץ׳",
+      "W_ALT": "דבליו"
+    },
+    "search_only_hebrew_equivalences": {
+      "א_ע_silent": [
+        "א",
+        "ע",
+        ""
+      ],
+      "ב_ו_for_v": [
+        "ב",
+        "ו"
+      ],
+      "ט_ת_for_t": [
+        "ט",
+        "ת"
+      ],
+      "כ_ק_for_k": [
+        "כ",
+        "ק"
+      ],
+      "כ_ח_for_kh": [
+        "כ",
+        "ח"
+      ],
+      "ס_ש_for_s": [
+        "ס",
+        "ש"
+      ],
+      "פ_ף": [
+        "פ",
+        "ף"
+      ],
+      "כ_ך": [
+        "כ",
+        "ך"
+      ],
+      "מ_ם": [
+        "מ",
+        "ם"
+      ],
+      "נ_ן": [
+        "נ",
+        "ן"
+      ],
+      "צ_ץ": [
+        "צ",
+        "ץ"
+      ],
+      "גרש_variants": [
+        "׳",
+        "'",
+        "’",
+        ""
+      ]
+    }
+  },
+  "existing_project_brand_overrides": [
+    {
+      "latin": "acer",
+      "hebrew": "אייסר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "adidas",
+      "hebrew": "אדידס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "apple",
+      "hebrew": "אפל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "armani",
+      "hebrew": "ארמני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "asus",
+      "hebrew": "אסוס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "baby",
+      "hebrew": "בייבי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "barbie",
+      "hebrew": "ברבי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "beauty",
+      "hebrew": "ביוטי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "bosch",
+      "hebrew": "בוש",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "boss",
+      "hebrew": "בוס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "braun",
+      "hebrew": "בראון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "bulgari",
+      "hebrew": "בולגרי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "bvlgari",
+      "hebrew": "בולגרי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "calvin klein",
+      "hebrew": "קלווין קליין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "canon",
+      "hebrew": "קנון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "care",
+      "hebrew": "קר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "chanel",
+      "hebrew": "שאנל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "clarins",
+      "hebrew": "קלרינס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "clinique",
+      "hebrew": "קליניק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "coca cola",
+      "hebrew": "קוקה קולה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "colgate",
+      "hebrew": "קולגייט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "crocs",
+      "hebrew": "קרוקס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "diesel",
+      "hebrew": "דיזל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dior",
+      "hebrew": "דיור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "disney",
+      "hebrew": "דיסני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dolce and gabbana",
+      "hebrew": "דולצ׳ה וגבאנה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dolce gabbana",
+      "hebrew": "דולצ׳ה וגבאנה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dove",
+      "hebrew": "דאב",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dream baby",
+      "hebrew": "דרים בייבי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dreambaby",
+      "hebrew": "דרים בייבי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "emporio armani",
+      "hebrew": "אמפוריו ארמני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "estee lauder",
+      "hebrew": "אסתי לאודר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "evian",
+      "hebrew": "אוויאן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "ferrero",
+      "hebrew": "פררו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "garnier",
+      "hebrew": "גרנייה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "gillette",
+      "hebrew": "ג׳ילט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "giorgio armani",
+      "hebrew": "ג׳ורג׳יו ארמני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "givenchy",
+      "hebrew": "ז׳יבנשי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "gucci",
+      "hebrew": "גוצ׳י",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hasbro",
+      "hebrew": "הסברו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "heinz",
+      "hebrew": "היינץ",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hello",
+      "hebrew": "הלו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hello kitty",
+      "hebrew": "הלו קיטי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hot wheels",
+      "hebrew": "הוט ווילס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "huawei",
+      "hebrew": "וואווי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "huggies",
+      "hebrew": "האגיס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hugo boss",
+      "hebrew": "הוגו בוס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kelloggs",
+      "hebrew": "קלוגס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kenzo",
+      "hebrew": "קנזו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kids",
+      "hebrew": "קידס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kinder",
+      "hebrew": "קינדר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kitchenaid",
+      "hebrew": "קיצ׳ן אייד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lacoste",
+      "hebrew": "לקוסט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lancome",
+      "hebrew": "לנקום",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lego",
+      "hebrew": "לגו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lenovo",
+      "hebrew": "לנובו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "levis",
+      "hebrew": "ליוויס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "life",
+      "hebrew": "לייף",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "life time",
+      "hebrew": "לייף טיים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lifetime",
+      "hebrew": "לייף טיים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "london",
+      "hebrew": "לונדון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "loreal",
+      "hebrew": "לוריאל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "loreal paris",
+      "hebrew": "לוריאל פריז",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "marvel",
+      "hebrew": "מארוול",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "max factor",
+      "hebrew": "מקס פקטור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "maybelline",
+      "hebrew": "מייבלין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "michael kors",
+      "hebrew": "מייקל קורס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "monster",
+      "hebrew": "מונסטר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "my office",
+      "hebrew": "מיי אופיס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nespresso",
+      "hebrew": "נספרסו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nestle",
+      "hebrew": "נסטלה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "neutrogena",
+      "hebrew": "ניוטרוג׳ינה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "new balance",
+      "hebrew": "ניו באלאנס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "new york",
+      "hebrew": "ניו יורק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nike",
+      "hebrew": "נייקי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nikon",
+      "hebrew": "ניקון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nivea",
+      "hebrew": "ניוואה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nutella",
+      "hebrew": "נוטלה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "oral b",
+      "hebrew": "אורל בי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "oreo",
+      "hebrew": "אוראו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pampers",
+      "hebrew": "פמפרס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "paris",
+      "hebrew": "פריז",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pepsi",
+      "hebrew": "פפסי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "perrier",
+      "hebrew": "פרייה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "philips",
+      "hebrew": "פיליפס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "playmobil",
+      "hebrew": "פליימוביל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "polo",
+      "hebrew": "פולו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "prada",
+      "hebrew": "פראדה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pro",
+      "hebrew": "פרו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "puma",
+      "hebrew": "פומה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "ralph lauren",
+      "hebrew": "ראלף לורן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "red bull",
+      "hebrew": "רד בול",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "reebok",
+      "hebrew": "ריבוק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "revlon",
+      "hebrew": "רבלון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "roborock",
+      "hebrew": "רובורוק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "samsung",
+      "hebrew": "סמסונג",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "siemens",
+      "hebrew": "סימנס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "skechers",
+      "hebrew": "סקצ׳רס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sony",
+      "hebrew": "סוני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sport",
+      "hebrew": "ספורט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "super pharm",
+      "hebrew": "סופר פארם",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "super-pharm",
+      "hebrew": "סופר-פארם",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tefal",
+      "hebrew": "טפאל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "the north face",
+      "hebrew": "דה נורת׳ פייס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tommy",
+      "hebrew": "טומי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tommy hilfiger",
+      "hebrew": "טומי הילפיגר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tp link",
+      "hebrew": "טי פי לינק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tp-link",
+      "hebrew": "טי-פי לינק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "under armour",
+      "hebrew": "אנדר ארמור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "versace",
+      "hebrew": "ורסאצ׳ה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "xiaomi",
+      "hebrew": "שיאומי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "avizarim",
+      "hebrew": "אביזרים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "o",
+      "hebrew": "או",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "omega",
+      "hebrew": "אומגה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "on",
+      "hebrew": "און",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "oscar",
+      "hebrew": "אוסקר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "oral",
+      "hebrew": "אורל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "orange",
+      "hebrew": "אורנג",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "aher",
+      "hebrew": "אחר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "eve",
+      "hebrew": "איב",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "easy",
+      "hebrew": "איזי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "in",
+      "hebrew": "אין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "intense",
+      "hebrew": "אינטנס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "n",
+      "hebrew": "אן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "and",
+      "hebrew": "אנד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "energy",
+      "hebrew": "אנרגי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "osem",
+      "hebrew": "אסם",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "essence",
+      "hebrew": "אסנס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "escada",
+      "hebrew": "אסקדה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "aqua",
+      "hebrew": "אקווה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "active",
+      "hebrew": "אקטיב",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "aroma",
+      "hebrew": "ארומה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "art",
+      "hebrew": "ארט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "bi",
+      "hebrew": "בי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "be life",
+      "hebrew": "בי לייף",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "big",
+      "hebrew": "ביג",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "bio",
+      "hebrew": "ביו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "by",
+      "hebrew": "ביי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "beit",
+      "hebrew": "בית",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "blue",
+      "hebrew": "בלו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "black",
+      "hebrew": "בלק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "ben",
+      "hebrew": "בן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "bar",
+      "hebrew": "בר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "guard",
+      "hebrew": "גארד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "go",
+      "hebrew": "גו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "gold",
+      "hebrew": "גולד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "gourmet",
+      "hebrew": "גורמה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "gel",
+      "hebrew": "גל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "glow",
+      "hebrew": "גלו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "garbei",
+      "hebrew": "גרבי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "garbayim",
+      "hebrew": "גרביים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "garden",
+      "hebrew": "גרדן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "green",
+      "hebrew": "גרין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dali",
+      "hebrew": "דאלי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "the",
+      "hebrew": "דה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dupont",
+      "hebrew": "דופון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "del",
+      "hebrew": "דל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dr",
+      "hebrew": "דר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "dry",
+      "hebrew": "דריי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hagalil",
+      "hebrew": "הגליל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hot",
+      "hebrew": "הוט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "home",
+      "hebrew": "הום",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hotsa'a",
+      "hebrew": "הוצאה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hotsaat",
+      "hebrew": "הוצאת",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "hair",
+      "hebrew": "הייר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "water",
+      "hebrew": "ווטר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "white",
+      "hebrew": "וויט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "waffle",
+      "hebrew": "וופל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "vit",
+      "hebrew": "ויט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "vita",
+      "hebrew": "ויטה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "vitamin",
+      "hebrew": "ויטמין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "wissotzky",
+      "hebrew": "ויסוצקי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "zayit",
+      "hebrew": "זית",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "touch",
+      "hebrew": "טאץ",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "touch",
+      "hebrew": "טאצ׳",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "teva",
+      "hebrew": "טבע",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tiv'i",
+      "hebrew": "טבעי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "top",
+      "hebrew": "טופ",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "t",
+      "hebrew": "טי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tiyulim",
+      "hebrew": "טיולים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "time",
+      "hebrew": "טיים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "true",
+      "hebrew": "טרו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "yevu",
+      "hebrew": "יבוא",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "u",
+      "hebrew": "יו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "yodfat",
+      "hebrew": "יודפת",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "yevu",
+      "hebrew": "ייבוא",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "yeladim",
+      "hebrew": "ילדים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "yekev",
+      "hebrew": "יקב",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "jerusalem",
+      "hebrew": "ירושלים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "israel",
+      "hebrew": "ישראל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "israeli",
+      "hebrew": "ישראלי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kef",
+      "hebrew": "כיף",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "love",
+      "hebrew": "לאב",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "laor",
+      "hebrew": "לאור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "le",
+      "hebrew": "לה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lee",
+      "hebrew": "לי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "lady",
+      "hebrew": "ליידי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "light",
+      "hebrew": "לייט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "line",
+      "hebrew": "ליין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mevutal",
+      "hebrew": "מבוטל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "medical",
+      "hebrew": "מדיקל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "madrikhei",
+      "hebrew": "מדריכי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "multi",
+      "hebrew": "מולטי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "moon",
+      "hebrew": "מון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mousse",
+      "hebrew": "מוס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "moschino",
+      "hebrew": "מוסקינו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mutsrei",
+      "hebrew": "מוצרי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "materna",
+      "hebrew": "מטרנה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mino",
+      "hebrew": "מינו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mini",
+      "hebrew": "מיני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "miss",
+      "hebrew": "מיס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mister",
+      "hebrew": "מיסטר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mamtakim",
+      "hebrew": "ממתקים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "men",
+      "hebrew": "מן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "makbil",
+      "hebrew": "מקביל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "max",
+      "hebrew": "מקס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mara",
+      "hebrew": "מרה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "marvel",
+      "hebrew": "מרוול",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "marina",
+      "hebrew": "מרינה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mark",
+      "hebrew": "מרק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "market",
+      "hebrew": "מרקט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "mishkafayim",
+      "hebrew": "משקפיים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nu",
+      "hebrew": "נו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "nova",
+      "hebrew": "נובה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "natural",
+      "hebrew": "נטורל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "night",
+      "hebrew": "נייט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "niyar",
+      "hebrew": "נייר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sun",
+      "hebrew": "סאן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sabon",
+      "hebrew": "סבון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "so",
+      "hebrew": "סו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sweet",
+      "hebrew": "סוויט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sukariyot",
+      "hebrew": "סוכריות",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "soft",
+      "hebrew": "סופט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "super",
+      "hebrew": "סופר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "star",
+      "hebrew": "סטאר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "style",
+      "hebrew": "סטייל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "c",
+      "hebrew": "סי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "city",
+      "hebrew": "סיטי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "silver",
+      "hebrew": "סילבר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cellular",
+      "hebrew": "סלולר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sano",
+      "hebrew": "סנו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "sense",
+      "hebrew": "סנס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "spa",
+      "hebrew": "ספא",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "speed",
+      "hebrew": "ספיד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "skin",
+      "hebrew": "סקין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "ugiyot",
+      "hebrew": "עוגיות",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "elite",
+      "hebrew": "עלית",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "etz",
+      "hebrew": "עץ",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pharm",
+      "hebrew": "פארם",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "food",
+      "hebrew": "פוד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pop",
+      "hebrew": "פופ",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "for",
+      "hebrew": "פור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "portofino",
+      "hebrew": "פורטופינו",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "formula",
+      "hebrew": "פורמולה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pure",
+      "hebrew": "פיור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pink",
+      "hebrew": "פינק",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "first",
+      "hebrew": "פירסט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "fisher",
+      "hebrew": "פישר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "flower",
+      "hebrew": "פלאוור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "plus",
+      "hebrew": "פלוס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "plaster",
+      "hebrew": "פלסטר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "flex",
+      "hebrew": "פלקס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "free",
+      "hebrew": "פרי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "pharma",
+      "hebrew": "פרמה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "perfect",
+      "hebrew": "פרפקט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "fresh",
+      "hebrew": "פרש",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tsipornaim",
+      "hebrew": "ציפורניים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tsa'atsuei",
+      "hebrew": "צעצועי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cool",
+      "hebrew": "קול",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "color",
+      "hebrew": "קולור",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "koleston",
+      "hebrew": "קולסטון",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cosmetics",
+      "hebrew": "קוסמטיקה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cosmetics",
+      "hebrew": "קוסמטיקס",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cat",
+      "hebrew": "קט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kylie",
+      "hebrew": "קיילי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kishutei",
+      "hebrew": "קישוטי",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "clean",
+      "hebrew": "קלין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "clear",
+      "hebrew": "קליר",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "camill",
+      "hebrew": "קמיל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cafe",
+      "hebrew": "קפה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "kria",
+      "hebrew": "קריאה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "careline",
+      "hebrew": "קרליין",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "cream",
+      "hebrew": "קרם",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "rishonim",
+      "hebrew": "ראשונים",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "red",
+      "hebrew": "רד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "rose",
+      "hebrew": "רוז",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "rihut",
+      "hebrew": "ריהוט",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "rykiel",
+      "hebrew": "ריקל",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "rekah",
+      "hebrew": "רקח",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "chocolate",
+      "hebrew": "שוקולד",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "shel",
+      "hebrew": "של",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "shemen",
+      "hebrew": "שמן",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tea",
+      "hebrew": "תה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tahtonei",
+      "hebrew": "תחתוני",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tinokot",
+      "hebrew": "תינוקות",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "tel aviv",
+      "hebrew": "תל אביב",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    },
+    {
+      "latin": "telma",
+      "hebrew": "תלמה",
+      "latin_alternatives": [],
+      "hebrew_alternatives": [],
+      "priority": 100,
+      "source": "existing_project_override"
+    }
+  ],
+  "ranking_guidance": {
+    "exact_normalized": 1.0,
+    "verified_brand_override": 0.99,
+    "source_language_rule": 0.93,
+    "phoneme_rule": 0.92,
+    "common_multigraph_rule": 0.88,
+    "single_letter_fallback": 0.7,
+    "inserted_unpointed_hebrew_vowel": 0.55,
+    "rule": "Multiply or sum log-weights across a candidate; retain top-N distinct normalized forms.",
+    "suggested_top_n_each_direction": 12
+  },
+  "decision_safety": {
+    "BLOCK": "Use only for exact normalized matches or a very high-confidence verified alias/phonetic duplicate.",
+    "REVIEW": "Use when a plausible transliteration candidate matches but pronunciation, origin or word boundary is ambiguous.",
+    "ALLOW": "Use only after exact, normalized, transliterated and phonetic candidate searches all remain below threshold."
+  },
+  "sources": [
+    {
+      "title": "Academy of the Hebrew Language — Transliteration",
+      "url": "https://eng.hebrew-academy.org.il/our-work/language-decisions/transliteration/",
+      "use": "Pronunciation-first principle and distinction between Hebrew-to-Latin and foreign-to-Hebrew rules."
+    },
+    {
+      "title": "Academy of the Hebrew Language — Transliteration rules",
+      "url": "https://hebrew-academy.org.il/כללי-התעתיק/",
+      "use": "Official Hebrew-language rule index."
+    },
+    {
+      "title": "BGN/PCGN 2018 Agreement — Romanization of Hebrew",
+      "url": "https://assets.publishing.service.gov.uk/media/5e4d10d886650c10ee32f51f/ROMANIZATION_OF_HEBREW.pdf",
+      "use": "Modern Hebrew consonants, vowel signs, foreign marked letters and contextual notes."
+    },
+    {
+      "title": "Unicode CLDR — Transliteration Guidelines",
+      "url": "https://cldr.unicode.org/index/cldr-spec/transliteration-guidelines",
+      "use": "Context-sensitive rules, reversibility limitations and fallback candidates."
+    },
+    {
+      "title": "Unicode CLDR — Latin-Hebrew transliteration chart",
+      "url": "https://www.unicode.org/cldr/cldr-aux/charts/26/transforms/Latin-Hebrew.html",
+      "use": "Unicode vowel-sign and transliteration reference."
+    }
+  ]
+}

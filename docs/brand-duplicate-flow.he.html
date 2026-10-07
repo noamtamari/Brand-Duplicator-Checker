@@ -1,0 +1,1449 @@
+<title>איך בודקים מותג חדש</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&family=Varela+Round&display=swap">
+
+<style>
+:root{
+  --ground:#EFF1F8;
+  --surface:#FFFFFF;
+  --surface-2:#F5F7FD;
+  --surface-3:#E7EBF7;
+  --ink:#1B1F33;
+  --ink-2:#414863;
+  --muted:#6C7392;
+  --line:#DADFF0;
+  --line-strong:#BAC2E0;
+  --accent:#4457C4;
+  --accent-ink:#3243A6;
+  --accent-soft:#E3E7FA;
+  --on-accent:#FFFFFF;
+  --block:#B3261E;
+  --block-soft:#FBE4E2;
+  --block-line:#EAB5B0;
+  --review:#A05800;
+  --review-soft:#FBEBD4;
+  --review-line:#E8C590;
+  --allow:#1B6E47;
+  --allow-soft:#DCEEE4;
+  --allow-line:#A7D3BC;
+  --code-bg:#1B1F33;
+  --code-ink:#E7EAF6;
+  --code-muted:#9AA2C4;
+  --shadow:0 1px 2px rgba(27,31,51,.05), 0 8px 22px -12px rgba(27,31,51,.3);
+  --radius:14px;
+  --body:"Rubik",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  --display:"Varela Round","Rubik",-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"Courier New",monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --ground:#0F1220;
+    --surface:#171B2E;
+    --surface-2:#1D2239;
+    --surface-3:#252B47;
+    --ink:#E7EAF6;
+    --ink-2:#BCC3DE;
+    --muted:#8E96B8;
+    --line:#2A3050;
+    --line-strong:#3C4468;
+    --accent:#8D9BF0;
+    --accent-ink:#A8B3F5;
+    --accent-soft:#232A4D;
+    --on-accent:#0F1220;
+    --block:#F0897F;
+    --block-soft:#3A1512;
+    --block-line:#6D2B23;
+    --review:#E5AC63;
+    --review-soft:#37260E;
+    --review-line:#6C4A1C;
+    --allow:#5FC28E;
+    --allow-soft:#102F1F;
+    --allow-line:#265F41;
+    --code-bg:#0A0D18;
+    --code-ink:#E7EAF6;
+    --code-muted:#8E96B8;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 22px -12px rgba(0,0,0,.75);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --ground:#0F1220;
+  --surface:#171B2E;
+  --surface-2:#1D2239;
+  --surface-3:#252B47;
+  --ink:#E7EAF6;
+  --ink-2:#BCC3DE;
+  --muted:#8E96B8;
+  --line:#2A3050;
+  --line-strong:#3C4468;
+  --accent:#8D9BF0;
+  --accent-ink:#A8B3F5;
+  --accent-soft:#232A4D;
+  --on-accent:#0F1220;
+  --block:#F0897F;
+  --block-soft:#3A1512;
+  --block-line:#6D2B23;
+  --review:#E5AC63;
+  --review-soft:#37260E;
+  --review-line:#6C4A1C;
+  --allow:#5FC28E;
+  --allow-soft:#102F1F;
+  --allow-line:#265F41;
+  --code-bg:#0A0D18;
+  --code-ink:#E7EAF6;
+  --code-muted:#8E96B8;
+  --shadow:0 1px 2px rgba(0,0,0,.45), 0 8px 22px -12px rgba(0,0,0,.75);
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  direction:rtl;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--body);
+  font-size:17px;
+  line-height:1.8;
+  -webkit-font-smoothing:antialiased;
+}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+a{color:var(--accent-ink)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
+
+.wrap{max-width:940px;margin:0 auto;padding-inline:20px;padding-block:0 90px}
+@media (max-width:480px){.wrap{padding-inline:16px}}
+.prose{max-width:700px}
+
+/* ---------- hero ---------- */
+.hero{padding-block:52px 30px}
+.kicker{
+  font-weight:600;font-size:13.5px;letter-spacing:.04em;color:var(--accent);margin:0 0 14px;
+}
+h1{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(30px,6vw,46px);line-height:1.25;
+  margin:0 0 18px;text-wrap:balance;
+}
+.lede{font-size:19px;line-height:1.8;color:var(--ink-2);margin:0;max-width:660px}
+.lede b{color:var(--ink);font-weight:600}
+
+/* stat tiles */
+.glance{
+  display:grid;gap:12px;margin-top:30px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+}
+@media (max-width:760px){.glance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:14px 16px;display:flex;flex-direction:column;gap:2px;
+}
+.stat-v{font-weight:600;font-size:clamp(22px,4vw,28px);line-height:1.25;color:var(--ink)}
+.stat-v small{font-size:.58em;font-weight:500;color:var(--ink-2);margin-inline-start:3px}
+.stat-l{font-size:14px;color:var(--muted);line-height:1.5}
+
+/* table of contents */
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.toc a{
+  text-decoration:none;font-size:14.5px;color:var(--ink-2);
+  background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px 13px;
+}
+.toc a:hover{border-color:var(--accent);color:var(--accent-ink)}
+
+hr.rule{border:none;border-top:1px solid var(--line);margin:0}
+
+section{padding-block:50px 0;scroll-margin-top:24px}
+h2{
+  font-family:var(--display);font-weight:400;
+  font-size:clamp(23px,4vw,31px);line-height:1.35;
+  margin:0 0 10px;text-wrap:balance;
+}
+.sub{font-size:16.5px;color:var(--muted);margin:0 0 28px;max-width:660px;line-height:1.75}
+.sub b{color:var(--ink-2);font-weight:600}
+p{margin:0 0 16px}
+h3.mini{
+  font-family:var(--display);font-weight:400;font-size:20px;line-height:1.4;margin:34px 0 12px;
+}
+
+.chip{
+  background:var(--surface-3);border:1px solid var(--line);
+  border-radius:8px;padding:2px 10px;font-size:15.5px;white-space:nowrap;
+}
+.eq{color:var(--muted);font-size:15px}
+.arrow{color:var(--muted);font-size:17px;line-height:1}
+
+/* ---------- problem list ---------- */
+.ways{display:grid;gap:12px;margin-top:26px}
+.way{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:17px 20px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;
+}
+.way-n{
+  width:30px;height:30px;border-radius:50%;flex:none;
+  background:var(--accent-soft);color:var(--accent-ink);
+  display:grid;place-items:center;font-weight:600;font-size:15px;margin-top:2px;
+}
+.way h3{font-family:var(--display);font-weight:400;font-size:19px;margin:0 0 5px;line-height:1.4}
+.way p{font-size:15.5px;color:var(--ink-2);margin:0;line-height:1.7}
+.way.hard{border-color:var(--accent);background:var(--accent-soft)}
+.way.hard .way-n{background:var(--accent);color:var(--on-accent)}
+.pair{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  margin-top:10px;font-size:16px;font-weight:500;
+}
+.pair .chip{padding:4px 11px}
+
+/* ---------- outcome cards ---------- */
+.outs{display:grid;gap:15px;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));margin-top:26px}
+.out{
+  background:var(--surface);border:1px solid var(--line);
+  border-top:4px solid;border-radius:var(--radius);
+  padding:22px 20px;box-shadow:var(--shadow);text-align:center;
+}
+.out.o2{border-top-color:var(--review)}
+.out.o3{border-top-color:var(--allow)}
+.out-ic{width:44px;height:44px;margin:0 auto 12px;display:block}
+.out.o2 .out-ic,.out.o2 .out-name{color:var(--review)}
+.out.o3 .out-ic,.out.o3 .out-name{color:var(--allow)}
+.out-name{font-family:var(--display);font-weight:400;font-size:22px;margin:0 0 9px;line-height:1.35}
+.out p{font-size:15.5px;color:var(--ink-2);margin:0;line-height:1.7}
+
+/* ---------- steps ---------- */
+.steps{margin-top:30px}
+.step{display:grid;grid-template-columns:56px 1fr;gap:20px}
+@media (max-width:480px){.step{grid-template-columns:44px 1fr;gap:14px}}
+.rail{display:flex;flex-direction:column;align-items:center}
+.dot{
+  width:44px;height:44px;flex:none;border-radius:50%;
+  background:var(--accent);color:var(--on-accent);
+  display:grid;place-items:center;
+  font-family:var(--display);font-size:20px;
+  box-shadow:0 0 0 5px var(--ground);
+}
+@media (max-width:480px){.dot{width:38px;height:38px;font-size:18px}}
+.bar{width:2px;flex:1;background:var(--line-strong);min-height:22px}
+.step:last-child .bar{background:transparent}
+.step-body{padding-bottom:30px;min-width:0}
+.step-body h3{
+  font-family:var(--display);font-weight:400;font-size:21px;
+  margin:6px 0 10px;line-height:1.4;
+}
+.step-body p{font-size:16px;color:var(--ink-2);line-height:1.8;margin:0 0 12px}
+.step-body p:last-child{margin-bottom:0}
+
+.like{
+  background:var(--surface);border:1px solid var(--line);
+  border-right:4px solid var(--accent);border-radius:10px;
+  padding:13px 16px;margin:14px 0 0;font-size:15.5px;line-height:1.7;color:var(--ink-2);
+}
+.like b{font-family:var(--display);font-weight:400;color:var(--accent-ink);display:block;margin-bottom:3px;font-size:15px}
+
+.follow{
+  display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+  background:var(--surface-2);border:1px dashed var(--line-strong);
+  border-radius:10px;padding:11px 15px;margin-top:14px;font-size:15px;color:var(--ink-2);
+}
+.follow-k{font-size:13px;color:var(--muted);font-weight:500}
+.follow .chip{background:var(--surface);font-weight:500}
+
+/* ---------- tags ---------- */
+.tag{
+  font-family:var(--display);font-weight:400;font-size:16px;
+  padding:8px 16px;border-radius:9px;border:1px solid;white-space:nowrap;display:inline-block;line-height:1.4;
+}
+.tag.sm{font-size:14px;padding:3px 10px;border-radius:7px}
+.t1{background:var(--block-soft);color:var(--block);border-color:var(--block-line)}
+.t2{background:var(--review-soft);color:var(--review);border-color:var(--review-line)}
+.t3{background:var(--allow-soft);color:var(--allow);border-color:var(--allow-line)}
+
+/* ---------- index: flow ---------- */
+.flow{
+  display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;
+  align-items:stretch;gap:10px;margin-top:6px;
+}
+.stage{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:14px 14px 13px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:3px;
+}
+.stage-v{font-weight:600;font-size:24px;line-height:1.25;color:var(--ink)}
+.stage-l{font-size:14px;color:var(--muted);line-height:1.5}
+.stage.last{background:var(--accent-soft);border-color:var(--accent)}
+.stage.last .stage-v{color:var(--accent-ink)}
+.flow-arr{align-self:center;color:var(--muted);font-size:20px}
+@media (max-width:700px){
+  .flow{grid-template-columns:1fr}
+  .flow-arr{justify-self:center;transform:rotate(-90deg);line-height:1}
+}
+
+/* ---------- tables ---------- */
+.tbl-wrap{
+  overflow-x:auto;margin-top:24px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+}
+table.tbl{width:100%;border-collapse:collapse;font-size:15px;line-height:1.6}
+.tbl th,.tbl td{text-align:right;padding:11px 14px;vertical-align:top;border-bottom:1px solid var(--line)}
+.tbl thead th{
+  font-weight:500;font-size:13.5px;color:var(--muted);background:var(--surface-2);
+  letter-spacing:.02em;white-space:nowrap;
+}
+.tbl tbody tr:last-child td{border-bottom:none}
+.tbl .grp td{
+  background:var(--surface-2);font-family:var(--display);font-size:15.5px;color:var(--accent-ink);
+  padding-block:8px;
+}
+.tbl .num{font-variant-numeric:tabular-nums;white-space:nowrap;text-align:left;direction:ltr}
+.tbl td.k{font-weight:500;color:var(--ink);min-width:150px}
+.tbl td.d{color:var(--ink-2)}
+.tbl .ex{font-family:var(--mono);font-size:13.5px;color:var(--ink-2);white-space:nowrap}
+.tbl .muted{color:var(--muted)}
+@media (max-width:700px){#speed table.tbl{min-width:620px}}
+.ex-tbl td:first-child{white-space:nowrap;font-weight:500}
+.ex-tbl td:nth-child(2){white-space:nowrap}
+.ex-tbl td.why{min-width:220px;color:var(--ink-2)}
+.tbl-note{font-size:14px;color:var(--muted);margin:10px 4px 0;line-height:1.65}
+
+/* ---------- callout ---------- */
+.callout{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;margin-top:22px;box-shadow:var(--shadow);
+}
+.callout h3{font-family:var(--display);font-weight:400;font-size:19px;margin:0 0 8px;line-height:1.4}
+.callout p{font-size:15.5px;color:var(--ink-2);line-height:1.75;margin:0 0 10px}
+.callout p:last-child{margin-bottom:0}
+.callout.soft{background:var(--surface-2);box-shadow:none}
+
+.weights{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px}
+.w{
+  display:inline-flex;gap:8px;align-items:baseline;font-size:14.5px;
+  background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:4px 11px;color:var(--ink-2);
+}
+.w b{font-weight:600;color:var(--ink);font-variant-numeric:tabular-nums}
+
+/* ---------- ladder ---------- */
+.ladder{display:grid;gap:11px;margin-top:26px}
+.rung{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:1fr auto;gap:18px;align-items:center;
+}
+.rung-q{font-size:17px;font-weight:500;line-height:1.6;margin:0}
+.rung-q small{display:block;font-size:14.5px;font-weight:400;color:var(--muted);margin-top:5px;line-height:1.65}
+.rung-q .num-line{display:block;margin-top:7px;font-size:13.5px;color:var(--ink-2);font-weight:500}
+@media (max-width:560px){
+  .rung{grid-template-columns:1fr;gap:13px}
+  .rung .tag{justify-self:start}
+}
+
+/* ---------- edge cases ---------- */
+.edges{display:grid;gap:14px;grid-template-columns:repeat(2,minmax(0,1fr));margin-top:26px}
+@media (max-width:720px){.edges{grid-template-columns:1fr}}
+.edge{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;
+}
+.edge-top{display:flex;gap:12px;justify-content:space-between;align-items:flex-start}
+.edge h3{font-family:var(--display);font-weight:400;font-size:18.5px;margin:0;line-height:1.45}
+.edge .pair{margin-top:0;font-size:15px}
+.edge .pair .chip{font-size:14.5px;padding:3px 10px}
+.edge p{font-size:15px;color:var(--ink-2);margin:0;line-height:1.7}
+.edge p b{color:var(--ink);font-weight:600}
+
+/* ---------- speed ---------- */
+.times{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:26px}
+@media (max-width:760px){.times{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.time{
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;
+  padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:4px;
+}
+.time-l{font-size:14px;color:var(--muted);font-weight:500}
+.time-v{font-weight:600;font-size:clamp(24px,4.5vw,30px);line-height:1.2;color:var(--ink)}
+.time-v small{font-size:.5em;font-weight:500;color:var(--ink-2);margin-inline-start:4px}
+.time p{font-size:14px;color:var(--ink-2);margin:2px 0 0;line-height:1.6}
+
+/* ---------- quality ---------- */
+.meters{
+  display:grid;gap:16px;margin-top:24px;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px 22px;box-shadow:var(--shadow);
+}
+.meter-row{display:grid;grid-template-columns:1fr auto;gap:4px 16px;align-items:baseline}
+.meter-l{font-size:15.5px;color:var(--ink);line-height:1.5}
+.meter-l small{display:block;font-size:13.5px;color:var(--muted);margin-top:1px}
+.meter-v{font-weight:600;font-size:16px;font-variant-numeric:tabular-nums;color:var(--ink);direction:ltr;white-space:nowrap}
+.meter{grid-column:1 / -1;height:8px;border-radius:99px;background:var(--allow-soft);overflow:hidden;margin-top:4px}
+.meter span{display:block;height:100%;border-radius:99px;background:var(--allow)}
+
+.limits{display:grid;gap:10px;margin-top:18px}
+.limit{
+  display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:start;
+  background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+}
+.limit-ic{width:22px;height:22px;color:var(--review);margin-top:3px}
+.limit p{margin:0;font-size:15px;color:var(--ink-2);line-height:1.7}
+.limit p b{color:var(--ink);font-weight:600}
+
+/* ---------- do ---------- */
+.dos{display:grid;gap:13px;margin-top:26px}
+.review-screen{margin:24px 0 0}
+.review-screen img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:8px}
+.review-screen figcaption{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.65}
+.do{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);
+  display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:start;
+}
+.do-ic{width:28px;height:28px;flex:none;margin-top:3px}
+.do.d2 .do-ic,.do.d2 h3{color:var(--review)}
+.do.d3 .do-ic,.do.d3 h3{color:var(--allow)}
+.do h3{font-family:var(--display);font-weight:400;font-size:19px;margin:0 0 5px;line-height:1.4}
+.do p{font-size:15.5px;color:var(--ink-2);margin:0;line-height:1.7}
+
+/* ---------- hebrew section ---------- */
+.compare{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 22px;box-shadow:var(--shadow);margin-top:24px;text-align:center;
+}
+.compare-row{
+  display:flex;gap:14px;align-items:center;justify-content:center;
+  flex-wrap:wrap;margin-bottom:18px;
+}
+.big{
+  font-family:var(--display);font-size:clamp(24px,5vw,34px);
+  background:var(--surface-2);border:1px solid var(--line);
+  border-radius:12px;padding:10px 22px;line-height:1.3;
+}
+.vs{font-size:15px;color:var(--muted);font-weight:500}
+.verdict{font-size:16px;line-height:1.75;margin:0;color:var(--ink-2)}
+.verdict .no{color:var(--block);font-weight:600}
+.verdict .yes{color:var(--allow);font-weight:600}
+
+/* ---------- footer ---------- */
+.foot{
+  margin-top:54px;padding-top:24px;border-top:1px solid var(--line);
+  font-size:14.5px;color:var(--muted);line-height:1.8;
+}
+.map{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;align-items:center}
+.map .chip{font-size:13.5px;padding:2px 9px}
+</style>
+
+<div class="wrap" dir="rtl">
+
+<header class="hero">
+  <p class="kicker">מדריך למערכת בדיקת כפילויות מותגים</p>
+  <h1>איך יודעים אם מותג כבר קיים?</h1>
+  <p class="lede">
+    בהרצה מ־6 באוקטובר 2026 היו במאגר החי <b>17,745 מותגים</b>. כל פעם שמישהו רוצה להוסיף מותג חדש,
+    המערכת צריכה לבדוק דבר אחד: האם השם הזה באמת חדש — או שהוא כבר במאגר, רק כתוב קצת אחרת?
+    הדף הזה מסביר איך הבדיקה עובדת, כמה זמן היא לוקחת, ואיפה היא עדיין טועה.
+  </p>
+  <p class="lede" style="margin-top:12px">
+    בהפעלה רגילה נדרש חיבור לרשת ואסימון גישה כדי לטעון את המאגר העדכני. הבדיקה עצמה
+    מבוססת על כללים קבועים, <b>ללא מודל בינה מלאכותית</b>: בהינתן אותו מאגר ואותם כללים,
+    אותו שם יקבל אותה תשובה, ולכל תשובה יש הסבר.
+  </p>
+
+  <div class="glance">
+    <div class="stat"><span class="stat-v">17,745</span><span class="stat-l">מותגים במאגר החי, 6.10.2026</span></div>
+    <div class="stat"><span class="stat-v">6.41<small>שניות</small></span><span class="stat-l">עד שמסך הבדיקה מוכן, בהרצה שנמדדה</span></div>
+    <div class="stat"><span class="stat-v">34</span><span class="stat-l">שמות נבדקו בכ־4.12 שניות באותה הרצה</span></div>
+    <div class="stat"><span class="stat-v"><span class="ltr">1,102<small> / 1,106</small></span></span><span class="stat-l">בדיקות על צילום המאגר המקומי, 4–5.10.2026</span></div>
+  </div>
+
+  <nav class="toc" aria-label="תוכן העניינים">
+    <a href="#problem">הבעיה</a>
+    <a href="#answers">שתי התוצאות</a>
+    <a href="#journey">המסע של שם</a>
+    <a href="#index">האינדקס</a>
+    <a href="#ladder">סולם ההחלטה</a>
+    <a href="#examples">דוגמאות</a>
+    <a href="#edges">מקרי קצה</a>
+    <a href="#hebrew">למה עברית קשה</a>
+    <a href="#speed">זמני ריצה</a>
+    <a href="#quality">דיוק ומגבלות</a>
+    <a href="#actions">מסך הבדיקה</a>
+  </nav>
+</header>
+
+<hr class="rule">
+
+<!-- ========== 1. הבעיה ========== -->
+<section id="problem">
+  <h2>מה הבעיה?</h2>
+  <p class="sub">
+    אם נוסיף מותג שכבר קיים, יהיו במאגר שתי שורות של אותו מותג. זה מבלבל את כולם —
+    ואחר כך קשה מאוד לתקן. הקושי הוא שאותו מותג יכול להיכתב בהרבה דרכים.
+    בצילום המאגר המקומי ששימש לבדיקות (17,653 מותגים) יש
+    <b>12,390 שמות באנגלית, 5,121 בעברית ו־132 שמשלבים את שתיהן</b>.
+  </p>
+
+  <div class="ways">
+    <div class="way">
+      <div class="way-n">1</div>
+      <div>
+        <h3>אותיות גדולות וקטנות</h3>
+        <p>אותו מותג בדיוק, רק עם אותיות אחרות.</p>
+        <div class="pair">
+          <span class="chip ltr">ADIDAS</span>
+          <span class="eq">=</span>
+          <span class="chip ltr">Adidas</span>
+          <span class="eq">=</span>
+          <span class="chip ltr">adidas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="way">
+      <div class="way-n">2</div>
+      <div>
+        <h3>רווחים ומקפים</h3>
+        <p>לפעמים כותבים עם מקף, לפעמים עם רווח, ולפעמים הכול מחובר.</p>
+        <div class="pair">
+          <span class="chip ltr">TP-LINK</span>
+          <span class="eq">=</span>
+          <span class="chip ltr">TP LINK</span>
+          <span class="eq">=</span>
+          <span class="chip ltr">TPLINK</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="way">
+      <div class="way-n">3</div>
+      <div>
+        <h3>שגיאות כתיב</h3>
+        <p>מישהו הקליד מהר מדי והוסיף אות מיותרת. הוא התכוון למותג שכבר קיים.</p>
+        <div class="pair">
+          <span class="chip ltr">Adiddas</span>
+          <span class="arrow">←</span>
+          <span class="eq">התכוונו ל־</span>
+          <span class="chip ltr">Adidas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="way hard">
+      <div class="way-n">4</div>
+      <div>
+        <h3>אלפבית אחר — וזה הקשה באמת</h3>
+        <p>
+          אותו מותג בדיוק, פעם בעברית ופעם באנגלית. אין ביניהם אפילו אות אחת משותפת,
+          ובכל זאת זה אותו דבר.
+        </p>
+        <div class="pair">
+          <span class="chip">אדידס</span>
+          <span class="eq">=</span>
+          <span class="chip ltr">ADIDAS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 2. התוצאות במסך ========== -->
+<section id="answers">
+  <h2>שתי התוצאות במסך הבדיקה</h2>
+  <p class="sub">
+    אחרי הבדיקה מופיע ליד כל שם אחד משני סטטוסים: <span class="ltr">REVIEW</span> או <span class="ltr">ALLOW</span>.
+    גם כשנמצאה התאמה ברורה למותג קיים, היא מוצגת כ־<span class="ltr">REVIEW</span> כדי שאדם ישווה את השמות לפני הייצוא.
+  </p>
+
+  <div class="outs">
+    <div class="out o2">
+      <svg class="out-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.6"/>
+        <path d="M4.5 20.5c0-3.7 3.4-6.2 7.5-6.2s7.5 2.5 7.5 6.2"/>
+      </svg>
+      <h3 class="out-name"><span class="ltr">REVIEW</span> · לבדיקה</h3>
+      <p>נמצא מותג זהה או דומה. בודקים את ההתאמות המוצגות ומחליטים אם לכלול את השם בייצוא.</p>
+    </div>
+
+    <div class="out o3">
+      <svg class="out-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M8 12.4l2.9 2.9 5.4-6"/>
+      </svg>
+      <h3 class="out-name"><span class="ltr">ALLOW</span> · לא נמצאה כפילות</h3>
+      <p>לא נמצאה התאמה משמעותית. השם מסומן לייצוא כברירת מחדל, ואפשר לשנות את הבחירה.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 3. המסע ========== -->
+<section id="journey">
+  <h2>המסע של שם אחד</h2>
+  <p class="sub">
+    בואו נלווה שם אחד לאורך כל הדרך. מישהו הקליד <span class="chip ltr">Adiddas</span>
+    ורוצה להוסיף אותו. נראה מה קורה לו בכל שלב.
+  </p>
+
+  <div class="steps">
+
+    <div class="step">
+      <div class="rail"><div class="dot">1</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>מקבלים את השם החדש</h3>
+        <p>מישהו כותב שם של מותג ומבקש להוסיף אותו. אפשר לבדוק שם אחד, או רשימה שלמה בבת אחת.</p>
+        <div class="follow">
+          <span class="follow-k">השם שלנו עכשיו:</span>
+          <span class="chip ltr">Adiddas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">2</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>מסדרים את השם</h3>
+        <p>
+          לפני שמחפשים משהו, כדאי לסדר. המערכת הופכת את כל האותיות לקטנות, הופכת מקפים,
+          נקודות ו־<span class="ltr">&amp;</span> לרווח, מאחדת את כל סוגי הגרש
+          (<span class="ltr">׳</span> ו־<span class="ltr">'</span>) ומוחקת רווחים מיותרים ותווים נסתרים.
+        </p>
+        <p>
+          אחרי הסידור, שני שמות שנכתבו אחרת נראים פתאום בדיוק אותו דבר:
+          <span class="chip ltr">TP-LINK</span> ו־<span class="chip ltr">TP LINK</span>
+          הופכים שניהם ל־<span class="chip ltr">tp link</span>.
+        </p>
+        <div class="like">
+          <b>כמו…</b>
+          לסדר את החדר לפני שמחפשים בו משהו. כשהכול במקום, הרבה יותר קל למצוא.
+        </div>
+        <div class="follow">
+          <span class="follow-k">אחרי הסידור:</span>
+          <span class="chip ltr">Adiddas</span>
+          <span class="arrow">←</span>
+          <span class="chip ltr">adiddas</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">3</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>מחפשים במהירות מי אולי דומה</h3>
+        <p>
+          לבדוק לעומק את כל המותגים במאגר ייקח יותר מדי זמן. אז קודם המערכת פונה
+          ל<b>אינדקס</b> שהיא בנתה מראש, ושולפת ממנו רק את השמות שיש סיבה לחשוד בהם —
+          עד מאה לכל שיטת חיפוש.
+        </p>
+        <p>רק הם ייבדקו לעומק. איך האינדקס בנוי — <a href="#index">בפרק הבא</a>.</p>
+        <div class="like">
+          <b>כמו…</b>
+          האינדקס בסוף ספר. במקום לקרוא את כל הספר מההתחלה, מסתכלים ברשימה הקטנה
+          ומגיעים ישר לעמוד הנכון.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">4</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>נותנים ציון לכל מועמד</h3>
+        <p>עכשיו המערכת בודקת כל מועמד לעומק, ונותנת לו ציון בין 0% ל־100%: כמה הוא דומה לשם החדש?</p>
+        <p>
+          היא מסתכלת על שלושה דברים: כמה אותיות צריך לשנות כדי להגיע משם אחד לשני ·
+          אילו זוגות אותיות מופיעים בשני השמות · והאם המילים מסתדרות אחת מול השנייה.
+        </p>
+        <div class="follow">
+          <span class="follow-k">הציון הגבוה ביותר:</span>
+          <span class="chip ltr">Adidas</span>
+          <span class="arrow">←</span>
+          <span>86% — צריך למחוק רק אות אחת.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">5</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>בודקים גם באלפבית השני</h3>
+        <p>
+          אם השם החדש כתוב באנגלית, המערכת כותבת אותו גם בעברית — ואם הוא בעברית, גם באנגלית.
+          מכיוון שכל אות יכולה לייצג כמה צלילים (ו יכולה להיות v, o או u), היא לא מסתפקת בכתיב אחד:
+          <span class="chip ltr">Adidas</span> מקבל <b>128 כתיבים אפשריים בעברית</b>, והראשון שבהם הוא
+          <span class="chip">אדידס</span>.
+        </p>
+        <p>
+          ואז היא משווה שוב, הפעם בין הגרסאות. כך <span class="chip">אדידס</span>
+          יכול סוף־סוף לפגוש את <span class="chip ltr">ADIDAS</span>.
+        </p>
+        <div class="like">
+          <b>כמו…</b>
+          שני ילדים שלא מדברים אותה שפה. מביאים מתורגמן, וכל אחד שומע את השני בשפה שלו.
+          פתאום מגלים שהם מדברים על אותו דבר.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">6</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>בודקים איך זה נשמע</h3>
+        <p>
+          לפעמים גם התרגום לא מספיק. אז המערכת <b>"אומרת" את שני השמות בקול</b> ובודקת אם הם
+          נשמעים אותו דבר. את השם הלועזי היא קוראת לפי כללי ההגייה של ארבע שפות —
+          אנגלית, צרפתית, איטלקית וגרמנית.
+        </p>
+        <p>
+          כך <span class="chip">ורסצ׳ה</span> פוגש את <span class="chip ltr">VERSACE</span>
+          (בקריאה איטלקית), ו־<span class="chip">גרנייה</span> פוגש את
+          <span class="chip ltr">GARNIER</span> (בקריאה צרפתית, שבה ה־r בסוף לא נשמעת).
+        </p>
+        <div class="like">
+          <b>כמו…</b>
+          לזהות חבר לפי הקול שלו בטלפון, גם כשאתם לא רואים אותו.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">7</div><div class="bar"></div></div>
+      <div class="step-body">
+        <h3>בוחרים חמישה מועמדים סופיים</h3>
+        <p>מכל המועמדים שנבדקו, המערכת בוחרת את <b>חמשת הדומים ביותר</b>.</p>
+        <p>
+          ויש כאן כלל חשוב: <b>שניים מתוך החמישה נשמרים תמיד למועמדים מהאלפבית השני.</b>
+        </p>
+        <p>
+          למה? בלי הכלל הזה, חמישה שמות באנגלית שרק נראים קצת דומים היו תופסים את כל המקומות —
+          והשם בעברית, שהוא המותג האמיתי, היה נדחף החוצה ואף אחד לא היה רואה אותו.
+          כשהיה שמור רק מקום אחד, ניחוש מקרי תפס אותו: לשם <span class="chip">מריל</span> נכנס
+          <span class="chip ltr">MRD</span> במקום <span class="chip ltr">Merrell</span>.
+        </p>
+        <div class="like">
+          <b>כמו…</b>
+          לשמור שני כיסאות בשורה הראשונה לאורחים שמגיעים מרחוק, כדי שלא יישארו בלי מקום.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="rail"><div class="dot">8</div></div>
+      <div class="step-body">
+        <h3>מחליטים</h3>
+        <p>
+          עכשיו המערכת שואלת כמה שאלות, אחת אחרי השנייה. היא עוצרת ברגע שהיא מקבלת
+          החלטה פנימית, שמוצגת במסך כאחת משתי תוצאות: <span class="ltr">REVIEW</span> או <span class="ltr">ALLOW</span>.
+          את סדר השאלות המדויק אפשר לראות ב<a href="#ladder">סולם ההחלטה</a>.
+        </p>
+        <div class="follow">
+          <span class="follow-k">התוצאה שלנו:</span>
+          <span class="chip ltr">Adiddas</span>
+          <span class="arrow">←</span>
+          <span class="tag t2 sm ltr">REVIEW</span>
+          <span>שגיאת כתיב של מותג שכבר במאגר; האדם יבדוק את ההתאמה.</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========== 4. האינדקס ========== -->
+<section id="index">
+  <h2>האינדקס: איך מוצאים מחט בערימה של אלפי שמות</h2>
+  <p class="sub">
+    כשהמערכת עולה, היא עוברת פעם אחת על כל המאגר ובונה <b>אינדקס</b> — רשימות מוכנות מראש
+    שאומרות, לכל "מפתח", אילו מותגים שייכים אליו. האינדקס נבנה מחדש מהמאגר העדכני בכל הרצה,
+    ואחר כך החיפוש שולף מועמדים מהרשימות במקום לעבור על כל המאגר.
+  </p>
+
+  <div class="flow" role="list" aria-label="מכל המאגר להחלטה אחת">
+    <div class="stage" role="listitem"><span class="stage-v">17,745</span><span class="stage-l">כל המותגים במאגר החי שנמדד</span></div>
+    <span class="flow-arr" aria-hidden="true">←</span>
+    <div class="stage" role="listitem"><span class="stage-v">מאות בודדות</span><span class="stage-l">מועמדים שהאינדקס שולף ומקבלים ציון מלא</span></div>
+    <span class="flow-arr" aria-hidden="true">←</span>
+    <div class="stage" role="listitem"><span class="stage-v">5</span><span class="stage-l">מועמדים סופיים שאדם רואה</span></div>
+    <span class="flow-arr" aria-hidden="true">←</span>
+    <div class="stage last" role="listitem"><span class="stage-v">1</span><span class="stage-l">תשובה</span></div>
+  </div>
+
+  <h3 class="mini">מה יש באינדקס</h3>
+  <p class="prose" style="color:var(--ink-2);font-size:16px">
+    האינדקס הוא בעצם כמה "קטלוגים" שונים של אותו מאגר. כל קטלוג תופס סוג אחר של דמיון,
+    ולכן שם שמתחמק מאחד ייתפס בדרך כלל באחר.
+  </p>
+
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr><th>קטלוג</th><th>דוגמה למפתח</th><th>מה הוא תופס</th><th class="num">מפתחות</th></tr>
+      </thead>
+      <tbody>
+        <tr class="grp"><td colspan="4">לפי איך השם כתוב</td></tr>
+        <tr>
+          <td class="k">השם המסודר</td>
+          <td class="ex ltr">tp link</td>
+          <td class="d">אותו שם בדיוק, אחרי הסידור</td>
+          <td class="num">17,259</td>
+        </tr>
+        <tr>
+          <td class="k">השם בלי רווחים</td>
+          <td class="ex ltr">tplink</td>
+          <td class="d"><span class="ltr">TP LINK</span> = <span class="ltr">TPLINK</span></td>
+          <td class="num">17,194</td>
+        </tr>
+        <tr>
+          <td class="k">שתי האותיות הראשונות</td>
+          <td class="ex ltr">tp</td>
+          <td class="d">שמות שמתחילים אותו דבר</td>
+          <td class="num">993</td>
+        </tr>
+        <tr>
+          <td class="k">זוגות אותיות צמודות</td>
+          <td class="ex ltr">tp · pl · li · in · nk</td>
+          <td class="d">שגיאות כתיב — גם כשאות אחת שגויה, רוב הזוגות נשארים</td>
+          <td class="num">1,746</td>
+        </tr>
+        <tr class="grp"><td colspan="4">בין עברית לאנגלית</td></tr>
+        <tr>
+          <td class="k">כל הכתיבים באנגלית של כל שם עברי</td>
+          <td class="ex">גרנייה → <span class="ltr">garnier · grnyh · grni …</span></td>
+          <td class="d">אדידס = <span class="ltr">adidas</span>. עד 24 כתיבים לכל שם, 115,686 בסך הכול</td>
+          <td class="num">112,860</td>
+        </tr>
+        <tr>
+          <td class="k">שלד העיצורים</td>
+          <td class="ex ltr">garnier → grnr</td>
+          <td class="d">שמות שהתנועות שלהם לא מסתדרות — עברית לא כותבת את רוב התנועות</td>
+          <td class="num">12,460</td>
+        </tr>
+        <tr class="grp"><td colspan="4">לפי צליל</td></tr>
+        <tr>
+          <td class="k">מפתח צליל</td>
+          <td class="ex">GARNIER, גרנייה → <span class="ltr">GRN</span></td>
+          <td class="d">שמות שנשמעים אותו דבר גם בלי אות משותפת אחת</td>
+          <td class="num">22,193</td>
+        </tr>
+        <tr>
+          <td class="k">מפתח צליל חסר עיצור</td>
+          <td class="ex ltr">GRNR → GRN · GNR · GRR · RNR</td>
+          <td class="d">שם שנכתב עם עיצור אחד פחות</td>
+          <td class="num">88,609</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tbl-note">
+    מפתחות = כמה ערכים שונים יש בכל קטלוג, כפי שנמדד על צילום המאגר המקומי (17,653 מותגים);
+    המספרים במאגר החי עשויים להשתנות. לצד הקטלוגים האלה יש גם
+    קטלוגים של האות הראשונה, ושל ההתחלה וזוגות האותיות של הכתיבים באנגלית.
+  </p>
+
+  <div class="callout">
+    <h3>איך מחליטים את מי לבדוק לעומק?</h3>
+    <p>
+      כל קטלוג "מצביע" בעד המותגים שהוא מצא, ולכל קטלוג משקל משלו. התאמה מלאה שווה הרבה,
+      דמיון חלקי שווה מעט:
+    </p>
+    <div class="weights">
+      <span class="w">שם זהה <b>1,000</b></span>
+      <span class="w">כתיב זהה בשפה השנייה <b>1,000</b></span>
+      <span class="w">זהה בלי רווחים <b>900</b></span>
+      <span class="w">שלד עיצורים זהה <b>800</b></span>
+      <span class="w">אותה התחלה <b>5</b></span>
+      <span class="w">אותה אות ראשונה <b>2</b></span>
+      <span class="w">כל זוג אותיות משותף <b>1</b></span>
+    </div>
+    <p style="margin-top:10px">
+      מאה המותגים עם הכי הרבה נקודות עוברים לבדיקה המלאה. החיפוש לפי צליל מוסיף עד 300 מועמדים
+      משלו, כי השוואת צליל זולה מאוד — כמה מיליוניות שנייה לזוג.
+    </p>
+  </div>
+
+  <div class="callout soft">
+    <h3>זיכרון בין הרצות</h3>
+    <p>
+      בניית האינדקס כוללת חישוב כתיבים אפשריים באנגלית לשמות בעברית. המערכת שומרת במטמון
+      את תוצאות התעתיק שחושבו, ומשתמשת בהן שוב בהרצות הבאות. האינדקס עצמו לא נשמר:
+      בכל הרצה טוענים את המאגר העדכני ובונים מחדש את רשימות החיפוש.
+    </p>
+    <p>
+      לשורת הפקודה ולמסך הבדיקה יש קובצי מטמון נפרדים. בהרצה ראשונה, או כשקובצי הקוד או
+      כללי התעתיק משתנים, התעתיקים מחושבים מחדש. מותג חדש במאגר נכלל כבר בהרצה הבאה;
+      אם התעתיק שלו עדיין לא נשמר, הוא יחושב אז ויישמר לשימוש חוזר.
+    </p>
+  </div>
+</section>
+
+<!-- ========== 5. סולם ההחלטה ========== -->
+<section id="ladder">
+  <h2>סולם ההחלטה</h2>
+  <p class="sub">
+    השאלות שהמנוע שואל, לפי הסדר. גם כשהוא מזהה התאמה ודאית למותג קיים,
+    במסך היא מופיעה כ־<span class="ltr">REVIEW</span> ולא כסטטוס שלישי.
+  </p>
+
+  <div class="ladder">
+    <div class="rung">
+      <p class="rung-q">
+        האם זה בדיוק אותו שם, אחרי שסידרנו אותו?
+        <small>אותן אותיות בדיוק, רק שנכתבו אחרת — אותיות גדולות, מקפים או רווחים.</small>
+        <span class="num-line">ציון 100%, עם רווחים או בלי</span>
+      </p>
+      <span class="tag t2 ltr">REVIEW</span>
+    </div>
+
+    <div class="rung">
+      <p class="rung-q">
+        האם זה אותו מותג בכתב השני, לפי רשימת התעתיקים המאומתת?
+        <small>רשימה של כ־120 מותגים שהכתיב שלהם בעברית ובאנגלית נבדק ידנית — למשל גוצ׳י ו־GUCCI. מילים כלליות כמו "ספורט" או "פריז" לא נכללות בה. תעתיק שהמערכת חישבה לבד לא יחסום לעולם — לכל היותר הוא שולח לבדיקה.</small>
+        <span class="num-line">ציון 98% ומעלה, ורק מהרשימה המאומתת</span>
+      </p>
+      <span class="tag t2 ltr">REVIEW</span>
+    </div>
+
+    <div class="rung">
+      <p class="rung-q">
+        האם זו שגיאת כתיב קטנה בשם ארוך?
+        <small>אות אחת שהתווספה, נמחקה או הוחלפה. בשם קצר זה לא נחשב — יותר מדי מותגים קצרים דומים זה לזה במקרה.</small>
+        <span class="num-line">הבדל של אות אחת · ציון 80% ומעלה · שני השמות באורך 6 תווים לפחות ובאותו מספר מילים</span>
+      </p>
+      <span class="tag t2 ltr">REVIEW</span>
+    </div>
+
+    <div class="rung">
+      <p class="rung-q">
+        האם מצאנו משהו דומה, או שם שנשמע אותו דבר?
+        <small>כאן המערכת לא בטוחה מספיק כדי להחליט לבד, אבל גם לא רוצה להתעלם. נחשב רק דמיון לשם כולו: שם שרק מוסיף מילים למותג קיים הוא שם חדש, וטעות הקלדה נחשבת רק כשהאותיות קרובות במקלדת או נשמעות אותו דבר.</small>
+        <span class="num-line">ציון 75% ומעלה · או התאמה בצליל · או שלד עיצורים זהה של 5 אותיות ומעלה</span>
+      </p>
+      <span class="tag t2 ltr">REVIEW</span>
+    </div>
+
+    <div class="rung">
+      <p class="rung-q">
+        לא מצאנו שום דבר דומה.
+        <small>אף מועמד לא הגיע לציון גבוה מספיק, ואף שם לא נשמע דומה.</small>
+      </p>
+      <span class="tag t3 ltr">ALLOW</span>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 6. דוגמאות ========== -->
+<section id="examples">
+  <h2>דוגמאות אמיתיות</h2>
+  <p class="sub">
+    השמות האלה הורצו במערכת על צילום המאגר המקומי. עמודת התוצאה מציגה את שני הסטטוסים של מסך הבדיקה;
+    הציונים וההסברים מסייעים להבין את ההחלטה, אך לא כולם מוצגים במסך עצמו.
+  </p>
+
+  <div class="tbl-wrap">
+    <table class="tbl ex-tbl">
+      <thead>
+        <tr><th>השם שהוקלד</th><th>תשובה</th><th>המותג שנמצא</th><th class="num">ציון</th><th>למה</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="ltr">ADIDAS</span></td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">Adidas</span></td>
+          <td class="num">100%</td>
+          <td class="why">אותו שם בדיוק אחרי הסידור</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">TP LINK</span></td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">TP LINK</span>, <span class="ltr">Tp-link</span></td>
+          <td class="num">100%</td>
+          <td class="why">רווח במקום מקף. נמצאו שתי רשומות קיימות</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">Adiddas</span></td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">Adidas</span></td>
+          <td class="num">86%</td>
+          <td class="why">אות מיותרת אחת בשם ארוך</td>
+        </tr>
+        <tr>
+          <td>אדידס</td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">Adidas</span></td>
+          <td class="num">99%</td>
+          <td class="why">תעתיק מהרשימה המאומתת</td>
+        </tr>
+        <tr>
+          <td>גוצ׳י</td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">GUCCI</span></td>
+          <td class="num">99%</td>
+          <td class="why">תעתיק מהרשימה המאומתת</td>
+        </tr>
+        <tr>
+          <td>ורסצ׳ה</td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">VERSACE</span></td>
+          <td class="num">88%</td>
+          <td class="why">נשמע אותו דבר בקריאה איטלקית. תעתיק מחושב — לכן בדיקה ולא חסימה</td>
+        </tr>
+        <tr>
+          <td>דאון טאון</td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">DOWN TOWN</span></td>
+          <td class="num">94%</td>
+          <td class="why">אותו צליל בדיוק</td>
+        </tr>
+        <tr>
+          <td>סי קיי</td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">CK</span></td>
+          <td class="num">94%</td>
+          <td class="why">ראשי תיבות שנכתבו בשמות האותיות</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">L'Oreal</span></td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">L'OREAL PARIS</span></td>
+          <td class="num">84%</td>
+          <td class="why">גרסה קצרה של מותג קיים</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">Adidsa</span></td>
+          <td><span class="tag t2 sm ltr">REVIEW</span></td>
+          <td><span class="ltr">Adidas</span></td>
+          <td class="num">76%</td>
+          <td class="why">שתי אותיות שהתחלפו במקומן — לא נחשב לטעות של אות אחת</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">Velmora</span></td>
+          <td><span class="tag t3 sm ltr">ALLOW</span></td>
+          <td><span class="ltr">Selmor</span></td>
+          <td class="num">69%</td>
+          <td class="why">שם מומצא; הציון נמוך מסף הבדיקה של 75%</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">NIVEA MEN</span></td>
+          <td><span class="tag t3 sm ltr">ALLOW</span></td>
+          <td class="muted">—</td>
+          <td class="num muted">—</td>
+          <td class="why">מוסיף מילה למותג קיים (<span class="ltr">NIVEA</span>) — לפי ההחלטה, זה מותג נפרד</td>
+        </tr>
+        <tr>
+          <td>סטפיל</td>
+          <td><span class="tag t3 sm ltr">ALLOW</span></td>
+          <td class="muted">סטייל</td>
+          <td class="num muted">60%</td>
+          <td class="why">פ ו־י רחוקות במקלדת — זו לא טעות הקלדה סבירה</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">HQ</span></td>
+          <td><span class="tag t3 sm ltr">ALLOW</span></td>
+          <td class="muted">הקס</td>
+          <td class="num muted">60%</td>
+          <td class="why">ניחוש חלש בין שפות לא עוצר שם</td>
+        </tr>
+        <tr>
+          <td><span class="ltr">Qwxzptlk</span></td>
+          <td><span class="tag t3 sm ltr">ALLOW</span></td>
+          <td class="muted"><span class="ltr">Taptap</span></td>
+          <td class="num muted">25%</td>
+          <td class="why">שום דבר לא דומה</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="tbl-note">
+    בשורות <span class="ltr">ALLOW</span>, מותג בצבע חלש הוא מועמד שנבדק ונדחה;
+    הוא לא מוצג במסך הבדיקה. בשורות <span class="ltr">REVIEW</span> מוצגים רק מועמדים שעברו את סף התצוגה (75%), עם שם, קוד וציון.
+  </p>
+</section>
+
+<!-- ========== 7. מקרי קצה ========== -->
+<section id="edges">
+  <h2>מקרי קצה — והחלטות שקיבלנו בכוונה</h2>
+  <p class="sub">
+    בכל מקרה כזה הייתה בחירה בין לתפוס עוד כפילויות לבין להטריד פחות אנשים בהתרעות שווא.
+    התוויות כאן הן הסטטוסים שיופיעו במסך הבדיקה.
+  </p>
+
+  <div class="edges">
+    <article class="edge">
+      <div class="edge-top">
+        <h3>שם שמוסיף מילים למותג קיים</h3>
+        <span class="tag t3 sm ltr">ALLOW</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">NIVEA MEN</span><span class="eq">מול</span><span class="chip ltr">NIVEA</span>
+        <span class="eq">·</span>
+        <span class="chip">טיימו ביוטי</span><span class="eq">מול</span><span class="chip ltr">TYMO</span>
+      </div>
+      <p>
+        <b>למה:</b> המאגר עצמו מחזיק קווי מוצר כמותגים נפרדים — <span class="ltr">POLO RED</span>,
+        אדידס קוסמטיקה. לכן רק דמיון לשם כולו יכול לעצור שם חדש.
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>שם קצר יותר ממותג קיים</h3>
+        <span class="tag t2 sm ltr">REVIEW</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">L'Oreal</span><span class="eq">מול</span><span class="chip ltr">L'OREAL PARIS</span>
+      </div>
+      <p>
+        <b>למה:</b> בכיוון ההפוך, סביר מאוד שזה אותו מותג בלי התוספת. לא מספיק בטוח כדי לחסום,
+        מספיק חשוד כדי לבדוק.
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>טעות הקלדה חייבת להיות אפשרית במקלדת</h3>
+        <span class="tag t3 sm ltr">ALLOW</span>
+      </div>
+      <div class="pair">
+        <span class="chip">סטפיל</span><span class="eq">מול</span><span class="chip">סטייל</span>
+      </div>
+      <p>
+        <b>למה:</b> החלפת אות נחשבת לטעות רק כשהמקשים שכנים (במקלדת העברית או האנגלית) או
+        כשהאותיות נשמעות אותו דבר (ט/ת, כ/ק, c/k). הוספה או השמטה של אות לא נבדקות לפי המקלדת,
+        כי בעברית כותבים ומשמיטים ו׳ ו־י׳ בחופשיות (טריקוסי / טריקסי).
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>בשם קצר, טעות לא חוסמת</h3>
+        <span class="tag t2 sm ltr">REVIEW</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">Kenzp</span><span class="eq">→</span><span class="chip ltr">Kenzo</span><span class="eq">80% · נשלח לבדיקה</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">Escadz</span><span class="eq">→</span><span class="chip ltr">Escada</span><span class="eq">83% · REVIEW (התאמה חזקה)</span>
+      </div>
+      <p>
+        <b>למה:</b> ככל שהשם קצר יותר, אות אחת היא חלק גדול יותר ממנו, ויש במאגר הרבה שמות קצרים
+        שנבדלים באות אחת במקרה. לכן חסימה אוטומטית על טעות דורשת 6 תווים לפחות — בשם של 5 אותיות
+        אותה טעות בדיוק מגיעה לאדם.
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>ניחוש חלש בין שפות לא עוצר שם</h3>
+        <span class="tag t3 sm ltr">ALLOW</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">HQ</span><span class="eq">→</span><span class="chip">הקס</span><span class="eq">60%</span>
+        <span class="eq">·</span>
+        <span class="chip ltr">Yeti</span><span class="eq">→</span><span class="chip">סיטי</span><span class="eq">61%</span>
+      </div>
+      <p>
+        <b>למה:</b> כל שם אפשר "לתרגם" למשהו שדומה למותג כלשהו מתוך מאגר של אלפי מותגים. בלי הכלל הזה כמעט
+        כל שם חדש היה נשלח לבדיקה. ניחוש כזה נחשב רק אם הצליל או העיצורים מאשרים אותו.
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>מילים כלליות לא חוסמות</h3>
+        <span class="tag t2 sm ltr">REVIEW</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">sport</span><span class="chip ltr">paris</span><span class="chip ltr">beauty</span><span class="chip">ילדים</span><span class="chip">מבוטל</span>
+      </div>
+      <p>
+        <b>למה:</b> 171 מילים כאלה הוצאו בכוונה מרשימת התעתיקים המאומתת. אחרת כל שם שמכיל
+        "Paris" היה נחסם. הן עדיין נמצאות בדרך הרגילה, ולכל היותר שולחות לבדיקה.
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>ראשי תיבות</h3>
+        <span class="tag t2 sm ltr">REVIEW</span>
+      </div>
+      <div class="pair">
+        <span class="chip ltr">CK</span><span class="eq">=</span><span class="chip">סי קיי</span>
+        <span class="eq">·</span>
+        <span class="chip ltr">DKNY</span><span class="eq">=</span><span class="chip">די קיי אן וואי</span>
+      </div>
+      <p>
+        <b>למה:</b> ראשי תיבות נכתבים בעברית בשמות האותיות. המערכת מזהה שם באנגלית כראשי תיבות
+        כשהוא 2–3 אותיות גדולות, או 2–5 אותיות בלי תנועה.
+      </p>
+    </article>
+
+    <article class="edge">
+      <div class="edge-top">
+        <h3>תעתיק מחושב לא חוסם לבד</h3>
+        <span class="tag t2 sm ltr">REVIEW</span>
+      </div>
+      <div class="pair">
+        <span class="chip">ורסצ׳ה</span><span class="eq">מול</span><span class="chip ltr">VERSACE</span><span class="eq">88%</span>
+      </div>
+      <p>
+        <b>למה:</b> גם תעתיק טוב מאוד הוא עדיין ניחוש. חסימה אוטומטית בין שפות שמורה רק לכ־120
+        המותגים שהכתיב שלהם אומת ידנית. כל השאר מגיעים לאדם, עם המותג הנכון ברשימה.
+      </p>
+    </article>
+  </div>
+</section>
+
+<!-- ========== 8. למה בעברית זה קשה ========== -->
+<section id="hebrew">
+  <h2>למה דווקא בעברית זה כל כך קשה?</h2>
+  <p class="sub">
+    זו הסיבה שחצי מהמערכת עוסקת רק בזה — ושווה להבין אותה.
+  </p>
+
+  <div class="prose">
+    <p>
+      בעברית לא כותבים את רוב התנועות. כשאנחנו כותבים מילה, אנחנו כותבים בעיקר את העיצורים
+      ומשאירים לקורא להשלים את השאר בראש. באנגלית, לעומת זאת, כותבים כמעט כל צליל —
+      ומותג שומר על הכתיב של שפת המקור שלו, גם כשחלק מהאותיות לא נשמעות.
+    </p>
+    <p>
+      בגלל זה אותו מותג בדיוק יכול להיראות בשתי השפות כמו שני דברים שאין ביניהם שום קשר:
+    </p>
+  </div>
+
+  <div class="compare">
+    <div class="compare-row">
+      <span class="big">גרנייה</span>
+      <span class="vs">מול</span>
+      <span class="big ltr">GARNIER</span>
+    </div>
+    <p class="verdict">
+      <span class="no">לפי האותיות:</span> אין ביניהם אפילו אות אחת משותפת.
+      מחשב שמשווה אותיות בלבד לא יחבר ביניהם לעולם.
+      <br>
+      <span class="yes">לפי הצליל:</span> הם נשמעים כמעט זהים — ושניהם נכנסים לאינדקס תחת אותו מפתח צליל,
+      <span class="ltr">GRN</span>.
+    </p>
+  </div>
+
+  <div class="prose" style="margin-top:22px">
+    <p>
+      בדיוק בגלל זה המערכת לא מסתפקת בהשוואת אותיות. היא בודקת גם איך השם נכתב,
+      גם איך הוא נראה באלפבית השני, <b>וגם איך הוא נשמע</b> — ורק אחרי כל זה היא מחליטה.
+      זוג נחשב לאותו שם רק אם כל עיצור מתאים לעיצור זהה או קרוב, ובשמות קצרים — אם אף תנועה
+      לא סותרת את הכתיב.
+    </p>
+  </div>
+</section>
+
+<!-- ========== 9. זמני ריצה ========== -->
+<section id="speed">
+  <h2>זמני ריצה</h2>
+  <p class="sub">
+    דוגמה מהרצה של אפליקציית הבדיקה עם מסך הבדיקה ב־6 באוקטובר 2026:
+    34 שמות מול 17,745 מותגים מהמאגר החי, עם מטמון תעתיקים שכבר היה קיים.
+    אלה זמני ההרצה הזו בלבד; הם משתנים לפי מהירות הרשת, המחשב, השמות ומצב המטמון.
+  </p>
+
+  <div class="times">
+    <div class="time">
+      <span class="time-l">עד שמסך הבדיקה מוכן</span>
+      <span class="time-v">6.41<small>שניות</small></span>
+      <p>כולל טעינת המאגר, המטמון, בניית האינדקס ובדיקת כל 34 השמות; ללא זמן הפעלת קובץ ההרצה.</p>
+    </div>
+    <div class="time">
+      <span class="time-l">טעינת המאגר מהשרת</span>
+      <span class="time-v">0.58<small>שנייה</small></span>
+      <p>כולל שליפת המאגר דרך הרשת והפיכתו לרשומות שהבודק יכול לקרוא.</p>
+    </div>
+    <div class="time">
+      <span class="time-l">בניית אינדקס</span>
+      <span class="time-v">1.51<small>שניות</small></span>
+      <p>האינדקס נבנה מחדש מהמאגר; 5,260 בקשות לתעתיקים נענו מהמטמון במהלך הבנייה.</p>
+    </div>
+    <div class="time">
+      <span class="time-l">בדיקת 34 שמות</span>
+      <span class="time-v">4.12<small>שניות</small></span>
+      <p>סך זמן הבדיקה של הרשימה, לא זמן בדיקה של שם יחיד או חציון לפי שפה.</p>
+    </div>
+  </div>
+
+  <div class="tbl-wrap">
+    <table class="tbl">
+      <thead>
+        <tr><th>שלב בהרצה</th><th class="num">זמן (בשניות)</th><th>מה נכלל</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="k">טעינת מטמון התעתיקים</td><td class="num">0.17</td><td>בדיקת תוקף המטמון וקריאתו מהקובץ</td></tr>
+        <tr><td class="k">טעינת המאגר</td><td class="num">0.58</td><td>בקשת השרת ופענוח הנתונים</td></tr>
+        <tr><td class="k">בניית האינדקס</td><td class="num">1.51</td><td>כולל שימוש בתעתיקים שנשמרו</td></tr>
+        <tr><td class="k">בדיקת השמות</td><td class="num">4.12</td><td>כל 34 השמות ברשימה יחד</td></tr>
+        <tr><td class="k">עד שמסך הבדיקה מוכן</td><td class="num">6.41</td><td>כולל גם טעינת הרשימה, הכנת התוצאות ופתיחת השרת המקומי</td></tr>
+        <tr><td class="k">בדיקה אנושית במסך</td><td class="num">84.70</td><td>הזמן שחלף מרגע פתיחת המסך עד לייצוא, לא זמן חישוב של המערכת</td></tr>
+        <tr><td class="k">משך ההרצה עד הייצוא</td><td class="num">91.11</td><td>כולל את זמן הבדיקה האנושית; ללא זמן עליית קובץ ההרצה</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout soft">
+    <h3>מה משפיע על משך הבדיקה?</h3>
+    <p>
+      שם בעברית עשוי לדרוש בדיקת כמה כתיבים אפשריים באנגלית, כי ו׳ יכולה להיות v, o או u,
+      ו־י׳ יכולה להיות i, y או e. גם שמות ארוכים ומרובי מילים עשויים לקחת יותר זמן.
+      המדידה הזאת אינה מפרידה בין זמני הבדיקה של שמות בעברית ובאנגלית.
+    </p>
+    <p>
+      <b>בפועל:</b> כדאי לבדוק רשימה שלמה בהרצה אחת: שליפת המאגר ובניית האינדקס
+      מתבצעות פעם אחת לרשימה. בפעם הראשונה, או אחרי שינוי בכללים או בקוד,
+      ייתכן שהבנייה תיקח יותר זמן כי המטמון מחושב מחדש.
+    </p>
+  </div>
+</section>
+
+<!-- ========== 10. דיוק ומגבלות ========== -->
+<section id="quality">
+  <h2>עד כמה זה מדויק?</h2>
+  <p class="sub">
+    במדידת הבדיקות מ־4–5 באוקטובר 2026 הורצו <b>1,106 בדיקות אוטומטיות</b> על צילום
+    המאגר המקומי (17,653 מותגים). 1,102 עברו וארבע היו מקרים מוכרים ומתועדים;
+    אלו לא נתוני דיוק שנמדדו על המאגר החי מהדוגמה בפרק זמני הריצה.
+  </p>
+
+  <div class="meters">
+    <div class="meter-row">
+      <span class="meter-l">שם בעברית של מותג שקיים באנגלית — נתפס<small>המותג הנכון בין חמשת המועמדים, והשם לא אושר</small></span>
+      <span class="meter-v">196 / 200</span>
+      <div class="meter" role="img" aria-label="196 מתוך 200"><span style="width:98%"></span></div>
+    </div>
+    <div class="meter-row">
+      <span class="meter-l">שם באנגלית של מותג שקיים בעברית — נתפס</span>
+      <span class="meter-v">200 / 200</span>
+      <div class="meter" role="img" aria-label="200 מתוך 200"><span style="width:100%"></span></div>
+    </div>
+    <div class="meter-row">
+      <span class="meter-l">שמות חדשים באמת — אושרו<small>שמות מומצאים, מותג עם מילה נוספת, מותג עם מילה שהוחלפה</small></span>
+      <span class="meter-v">200 / 200</span>
+      <div class="meter" role="img" aria-label="200 מתוך 200"><span style="width:100%"></span></div>
+    </div>
+    <div class="meter-row">
+      <span class="meter-l">כמעט־כפילויות — נשלחו לאדם<small>טעויות חלשות, גרסה קצרה של מותג, תעתיק מחושב</small></span>
+      <span class="meter-v">166 / 166</span>
+      <div class="meter" role="img" aria-label="166 מתוך 166"><span style="width:100%"></span></div>
+    </div>
+    <div class="meter-row">
+      <span class="meter-l">תרחישי קבלה שהוגדרו ידנית</span>
+      <span class="meter-v">120 / 120</span>
+      <div class="meter" role="img" aria-label="120 מתוך 120"><span style="width:100%"></span></div>
+    </div>
+  </div>
+
+  <p class="tbl-note" style="max-width:700px">
+    חשוב לדעת: הכללים כוילו מול הבדיקות האלה, ולכן הן מוכיחות שהמערכת עושה את מה שהוגדר לה
+    ושום שינוי לא שובר את מה שכבר עבד. הן לא מבטיחות אחוז הצלחה זהה על שמות חדשים לגמרי.
+    הספים עוד לא כוילו על מאגר גדול שנבדק ידנית.
+  </p>
+
+  <h3 class="mini">כמה עבודה זה משאיר לאנשים?</h3>
+  <p class="prose" style="color:var(--ink-2);font-size:16px">
+    במדידה על צילום המאגר המקומי, ברשימת מבחן של 100 מותגים מוצעים באנגלית,
+    <b>77 אושרו כחדשים ו־23 נשלחו לבדיקה</b>.
+    ברשימה המקבילה בעברית: 82 ו־18. כלומר אדם צריך להסתכל בערך על שם אחד מכל חמישה —
+    ובמסך מוצגות לו ההתאמות שעברו את סף התצוגה, לא כל המאגר.
+  </p>
+
+  <h3 class="mini">איפה המערכת עדיין טועה</h3>
+  <p class="prose" style="color:var(--ink-2);font-size:16px">
+    19 שמות שהמערכת מטפלת בהם לא נכון מתועדים בקובץ אחד, ונבדקים מחדש בפקודה אחת אחרי כל שינוי.
+    הם מתחלקים לארבעה סוגים:
+  </p>
+  <div class="limits">
+    <div class="limit">
+      <svg class="limit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5"/><path d="M12 17.4v.1"/></svg>
+      <p><b>שמות ארוכים שנכתבים בעברית אחרת לגמרי.</b>
+        <span>איב סן לורן</span> לא מוצא את <span class="ltr">YVES SAINT LAURENT</span>, ו־<span>ז׳אן פול גוטייה</span>
+        לא מוצא את <span class="ltr">Jean Paul GAULTIER</span> — רק המילה הראשונה מתאימה.</p>
+    </div>
+    <div class="limit">
+      <svg class="limit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5"/><path d="M12 17.4v.1"/></svg>
+      <p><b>שתי מילים שנכתבו כמילה אחת.</b>
+        <span>מונבלאן</span> מול <span class="ltr">MONT BLANC</span> (60%), <span>אוונגרד</span> מול
+        <span class="ltr">AVANT GARDE</span> — הציון נשאר מתחת לסף.</p>
+    </div>
+    <div class="limit">
+      <svg class="limit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5"/><path d="M12 17.4v.1"/></svg>
+      <p><b>החלפת מקום של שתי אותיות בשם קצר.</b>
+        <span class="ltr">Paoyt</span> מול <span class="ltr">PAYOT</span> ו־<span>קסרטו</span> מול <span>קסטרו</span>
+        מקבלים 63% —  מתחת לסף של 75%, ולכן מאושרים.</p>
+    </div>
+    <div class="limit">
+      <svg class="limit-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3.5l9 16H3z"/><path d="M12 10v4.5"/><path d="M12 17.4v.1"/></svg>
+      <p><b>ההחלטה נכונה, אבל המותג הנכון לא בין החמישה.</b>
+        <span class="ltr">Knezo</span> נשלח לבדיקה, אבל הבודק רואה חמישה קווי מוצר של קנזו ולא את
+        <span class="ltr">Kenzo</span> עצמו.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== 11. מה עושים ========== -->
+<section id="actions">
+  <h2>מה עושים במסך הבדיקה?</h2>
+  <p class="sub">האפליקציה מציגה לכל שם סטטוס אחד מתוך שניים. הבחירה בתיבת הסימון קובעת אם הוא ייכלל בייצוא.</p>
+
+  <div class="dos">
+    <div class="do d2">
+      <svg class="do-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="8" r="3.6"/>
+        <path d="M4.5 20.5c0-3.7 3.4-6.2 7.5-6.2s7.5 2.5 7.5 6.2"/>
+      </svg>
+      <div>
+        <h3><span class="ltr">REVIEW</span> · לבדיקה</h3>
+        <p>
+          משווים את השם למותגים המוצגים תחתיו. אם הוא כבר קיים, משאירים את התיבה ריקה;
+          אם בדקתם והוא מותג חדש, מסמנים אותו כדי לכלול אותו בייצוא.
+        </p>
+      </div>
+    </div>
+
+    <div class="do d3">
+      <svg class="do-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"/>
+        <path d="M8 12.4l2.9 2.9 5.4-6"/>
+      </svg>
+      <div>
+        <h3><span class="ltr">ALLOW</span> · לא נמצאה כפילות</h3>
+        <p>התיבה מסומנת מראש. אפשר לבטל את הסימון אם לא רוצים לייצא את השם.</p>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mini">מסך הבדיקה</h3>
+  <figure class="review-screen">
+    <a href="../assets/Screenshot%202026-10-06%20111417.png" target="_blank" rel="noopener" aria-label="פתיחת צילום מסך של Brand Review בגודל מלא">
+      <img src="../assets/Screenshot%202026-10-06%20111417.png" alt="מסך Brand Review: 33 שמות, 22 במצב REVIEW ו־11 במצב ALLOW; תיבות בחירה, מסננים והודעת ייצוא" loading="lazy">
+    </a>
+    <figcaption>צילום מסך לאחר יצירת קובצי הייצוא. אפשר ללחוץ על התמונה כדי לפתוח אותה בגודל מלא. המספרים בתמונה מתייחסים לרשימה שצולמה, לא לכל הרצה.</figcaption>
+  </figure>
+  <div class="prose" style="color:var(--ink-2);font-size:16px">
+    <p>בראש המסך מוצגים מספר השמות ברשימה, מספר השמות שנבחרו לייצוא וחלוקה ל־<span class="ltr">REVIEW</span> ו־<span class="ltr">ALLOW</span>.
+      הלחצנים <span class="ltr">All / REVIEW / ALLOW</span> מסננים את הרשימה לתצוגה בלבד; הם לא משנים את הבחירה.</p>
+    <p>בכל שורה מופיעים השם, הסטטוס ותיבת בחירה. לשמות ב־<span class="ltr">REVIEW</span> מוצגות התאמות אפשריות עם שם המותג הקיים, הקוד וציון הדמיון כשהן עוברות את סף התצוגה;
+      אם אין התאמות מעל הסף, המסך מציין זאת. <span class="ltr">Select visible</span> מסמן או מבטל רק את השמות שמוצגים במסנן הנוכחי.
+      שינוי הבחירה לא משנה את הסטטוס של השם.</p>
+    <p>לחיצה על <span class="ltr">Create output</span> יוצרת שני קובצי CSV עבור השמות המסומנים בלבד:
+      <span class="ltr">SP_brands_*.csv</span> ו־<span class="ltr">SP_brand_relations_*.csv</span>.
+      הודעת ההצלחה מציגה את שמות הקבצים ואת מספר השמות שיוצאו; קובצי ייצוא קודמים מאותו סוג מוחלפים.
+      קובץ <span class="ltr">timing.json</span> נפרד מתעד גם את זמני הבדיקה וזמן העבודה במסך.</p>
+  </div>
+</section>
+
+<p class="foot">
+  הדף הזה מתאר את המערכת כפי שהיא עובדת היום. הוא לא מתאר תוכניות או שיפורים עתידיים.
+  מספרי האינדקס, הדוגמאות ובדיקות האיכות נמדדו על צילום מאגר מקומי מ־4–5 באוקטובר 2026;
+  זמני הריצה ומספר המותגים החיים לקוחים מהרצת מסך הבדיקה ב־6 באוקטובר 2026.
+  המאגר החי משתנה, ולכן הנתונים האלה אינם מספרים קבועים.
+  <br>
+  במסך הבדיקה שני הסטטוסים הם:
+</p>
+<div class="map">
+  <span class="chip" style="color:var(--review);border-color:var(--review-line);background:var(--review-soft)">דורש השוואה למותג קיים</span>
+  <span class="eq">=</span><span class="chip ltr">REVIEW</span>
+  <span style="color:var(--line-strong)">·</span>
+  <span class="chip" style="color:var(--allow);border-color:var(--allow-line);background:var(--allow-soft)">לא נמצאה כפילות</span>
+  <span class="eq">=</span><span class="chip ltr">ALLOW</span>
+</div>
+
+</div>

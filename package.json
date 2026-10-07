@@ -1,0 +1,31 @@
+{
+  "name": "brand-duplicate-checker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test \"dist/brand-duplicate/__tests__/production/*.test.js\" \"dist/brand-duplicate/__tests__/development/*.test.js\"",
+    "test:production": "npm run build && node --test \"dist/brand-duplicate/__tests__/production/*.test.js\"",
+    "test:development": "npm run build && node --test \"dist/brand-duplicate/__tests__/development/*.test.js\"",
+    "test:brand-manual-acceptance": "npm run build && node --test dist/brand-duplicate/__tests__/production/brand-manual-acceptance.test.js",
+    "brand:check": "npm run build && node dist/brand-duplicate/brand-cli.js",
+    "brand:review:build": "node scripts/build-brand-review-exe.mjs",
+    "brand:review": "node scripts/run-brand-review.mjs",
+    "test:review-app": "node scripts/run-brand-review-tests.mjs",
+    "test:brand-translation:he-en": "npm run build && node --test dist/brand-duplicate/__tests__/production/brand-translation-he-to-en.test.js",
+    "test:brand-translation:en-he": "npm run build && node --test dist/brand-duplicate/__tests__/production/brand-translation-en-to-he.test.js",
+    "test:brand-translation:precision": "npm run build && node --test dist/brand-duplicate/__tests__/development/brand-translation-precision.test.js",
+    "test:brand-allow": "npm run build && node --test dist/brand-duplicate/__tests__/production/brand-expected-allow.test.js",
+    "test:brand-review": "npm run build && node --test dist/brand-duplicate/__tests__/production/brand-expected-review.test.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.4.0",
+    "esbuild": "^0.28.2",
+    "postject": "^1.0.0-alpha.6",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.5"
+  }
+}
