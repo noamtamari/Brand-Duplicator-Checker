@@ -1,0 +1,31 @@
+
+| #  | Proposed brand   | Expected  | Expected existing candidate(s)                        | מה נבדק                              |
+| -- | ---------------- | --------- | ----------------------------------------------------- | ------------------------------------ |
+| 1  | `Versace`        | **BLOCK** | `b_104 VERSACE`, `b_4680 Versace`                     | Case insensitive + duplicates קיימים |
+| 2  | `VERSACE`        | **BLOCK** | אותם מועמדים                                          | Exact                                |
+| 3  | `dunhill`        | **BLOCK** | `b_2315 DUNHILL`, `b_1457 dunhill`                    | Case                                 |
+| 4  | `Dior`           | **BLOCK** | `b_4463 DIOR`, `b_38 Dior`                            | Case                                 |
+| 5  | `BVLGARI`        | **BLOCK** | `b_1278 BVLGARI`, `b_1960 Bvlgari`                    | Case                                 |
+| 6  | `Roborock`       | **BLOCK** | `b_6133mp Roborock`, `b_7391 ROBOROCK`                | כפילות קיימת                         |
+| 7  | `TP-LINK`        | **BLOCK** | `b_4744 TP LINK`, `b_9485mp Tp-link`                  | Hyphen/space                         |
+| 8  | `TP LINK`        | **BLOCK** | אותם מועמדים                                          | Separator normalization              |
+| 9  | `Theraband`      | **BLOCK** | `b_5665mp Thera-Band`, `b_11113mp Theraband`          | Hyphen                               |
+| 10 | `Dream Baby`     | **BLOCK** | `b_6109mp Dreambaby`, `b_10990mp Dream Baby`          | Space                                |
+| 11 | `CrankBrothers`  | **BLOCK** | `b_12555mp Crank Brothers`, `b_12556mp CrankBrothers` | Space                                |
+| 12 | `BabyBasic`      | **BLOCK** | `b_12912mp babybasic`, `b_15029mp BABY BASIC`         | Space + case                         |
+| 13 | `LEVI'S`         | **BLOCK** | `b_6308mp LEVIS`, `b_6625 LEVI'S`                     | Apostrophe                           |
+| 14 | `HotWheels`      | **BLOCK** | `b_8554mp Hot Wheels`, `b_7160 Hotwheels`             | Space                                |
+| 15 | `BODYGLIDE`      | **BLOCK** | `b_11197mp Body Glide`, `b_12545mp BODYGLIDE`         | Compound word                        |
+| 16 | `My Office`      | **BLOCK** | `b_10594mp MY OFFICE`, `b_7485 My-Office`             | Hyphen                               |
+| 17 | `STORZ & BICKEL` | **BLOCK** | `b_6111 STORZ&BICKEL`, `b_6243 STORZ & BICKEL`        | Ampersand/spacing                    |
+| 18 | `Neutrogena`     | **BLOCK** | `b_33 NEUTROGENA `                                    | trailing NBSP                        |
+| 19 | `L'HOMME`        | **BLOCK** | `b_5138 LHOMME`, `b_3956 l'homme`, `b_3903 L'HOMME`   | Apostrophe                           |
+| 20 | `Polo`           | **BLOCK** | `b_2051 POLO`, `b_89 POLO`                            | exact duplicates                     |
+| 21 | `Gucci`          | **BLOCK** | `b_4480 GUCCI`, `b_72 GUCCI`                          | exact duplicates                     |
+| 22 | `Armani`         | **BLOCK** | `b_93 armani`, `b_5897 armani`                        | exact duplicates                     |
+| 23 | `Emporio Armani` | **BLOCK** | `b_4543 EMPORIO ARMANI`, `b_8658mp Emporio Armani`    | duplicate/case                       |
+| 24 | `MIU MIU`        | **BLOCK** | existing `MIU MIU` / `miu miu`                        | case                                 |
+| 25 | `TEFAL`          | **BLOCK** | existing `Tefal` / `TEFAL`                            | case                                 |
+
+tomy hilfiger exist but טומי הילפיגר decision is ALLOW with 0.37 confidence
+דאון טאון is allow, it translate to DOWN TOWN correctly but with 68% score.

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brand Review</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #17251f;
+      --muted: #65736d;
+      --paper: #f4f6f2;
+      --line: #d8dfd8;
+      --green: #1f6a4b;
+      --green-soft: #e1f1e8;
+      --amber: #8a5310;
+      --amber-soft: #fff0d6;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.45 "Segoe UI", sans-serif; }
+    header { padding: 26px max(22px, calc((100vw - 1080px) / 2)); background: #173b2c; color: white; }
+    h1 { margin: 0; font-size: 26px; font-weight: 650; }
+    header p { margin: 5px 0 0; color: #d1e2d7; }
+    main { max-width: 1080px; margin: 0 auto; padding: 24px 22px 40px; }
+    .toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+    .counts { margin-right: auto; color: var(--muted); }
+    .filters { display: inline-flex; border: 1px solid var(--line); border-radius: 4px; padding: 3px; background: var(--white); }
+    .filters button { min-height: 32px; border: 0; padding: 0 10px; }
+    .filters button[aria-pressed="true"] { background: var(--green-soft); color: var(--green); }
+    button { min-height: 40px; border: 1px solid #bec9c0; border-radius: 4px; padding: 0 15px; background: var(--white); color: var(--ink); font: inherit; font-weight: 600; cursor: pointer; }
+    button:hover { border-color: var(--green); }
+    button:disabled { cursor: wait; opacity: .65; }
+    button.primary { border-color: var(--green); background: var(--green); color: white; }
+    #rows { margin-top: 4px; }
+    .row { display: grid; grid-template-columns: 26px minmax(180px, 1fr) 110px; gap: 14px; align-items: start; padding: 17px 8px; border-bottom: 1px solid var(--line); }
+    .row input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--green); }
+    .brand { overflow-wrap: anywhere; font-size: 16px; font-weight: 600; }
+    .candidates { margin-top: 5px; color: var(--muted); font-size: 13px; }
+    .status { justify-self: end; min-width: 78px; border-radius: 3px; padding: 4px 9px; text-align: center; font-size: 12px; font-weight: 700; }
+    .allow { background: var(--green-soft); color: var(--green); }
+    .review { background: var(--amber-soft); color: var(--amber); }
+    #notice { margin: 16px 0; color: var(--green); font-weight: 600; }
+    #notice.error { color: #a12c27; }
+    @media (max-width: 560px) {
+      header { padding: 20px 18px; }
+      main { padding: 16px 14px 28px; }
+      .row { grid-template-columns: 24px minmax(0, 1fr); gap: 10px; }
+      .status { grid-column: 2; grid-row: 1; justify-self: start; }
+      .brand { padding-top: 32px; grid-column: 2; grid-row: 1; }
+      .candidates { grid-column: 2; }
+      .counts { width: 100%; }
+      .filters { order: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Brand Review</h1>
+    <p id="summary">Checking the selected brands</p>
+  </header>
+  <main>
+    <div class="toolbar">
+      <span class="counts" id="counts" aria-live="polite"></span>
+      <div class="filters" role="group" aria-label="Filter brands by result">
+        <button type="button" data-filter="ALL" aria-pressed="true">All</button>
+        <button type="button" data-filter="REVIEW" aria-pressed="false">REVIEW</button>
+        <button type="button" data-filter="ALLOW" aria-pressed="false">ALLOW</button>
+      </div>
+      <button id="select-all" type="button">Select All</button>
+      <button class="primary" id="create" type="button">Create output</button>
+    </div>
+    <div id="notice" role="status" aria-live="polite"></div>
+    <section id="rows" aria-label="Brand check results"></section>
+  </main>
+  <script>
+    let requestToken = "";
+    let items = [];
+    let activeFilter = "ALL";
+    const rowsElement = document.querySelector("#rows");
+    const notice = document.querySelector("#notice");
+    const createButton = document.querySelector("#create");
+    const selectAllButton = document.querySelector("#select-all");
+    const filterButtons = [...document.querySelectorAll("[data-filter]")];
+
+    function visibleItems() {
+      return activeFilter === "ALL" ? items : items.filter((item) => item.outcome === activeFilter);
+    }
+
+    function updateCount() {
+      const selected = items.filter((item) => item.selected).length;
+      const visible = visibleItems();
+      const visibleSelected = visible.filter((item) => item.selected).length;
+      const reviewCount = items.filter((item) => item.outcome === "REVIEW").length;
+      const allowCount = items.length - reviewCount;
+      document.querySelector("#counts").textContent = `${selected} of ${items.length} selected | ${reviewCount} REVIEW | ${allowCount} ALLOW`;
+      selectAllButton.textContent = visible.length > 0 && visibleSelected === visible.length ? "Unselect visible" : "Select visible";
+      selectAllButton.disabled = visible.length === 0;
+      for (const button of filterButtons) {
+        button.setAttribute("aria-pressed", String(button.dataset.filter === activeFilter));
+      }
+    }
+
+    function render() {
+      rowsElement.replaceChildren();
+      const visible = visibleItems();
+      for (const item of visible) {
+        const row = document.createElement("article");
+        row.className = "row";
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = item.selected;
+        checkbox.setAttribute("aria-label", `Select ${item.brand}`);
+        checkbox.addEventListener("change", () => { item.selected = checkbox.checked; updateCount(); });
+        const detail = document.createElement("div");
+        const brand = document.createElement("div");
+        brand.className = "brand";
+        brand.textContent = item.brand;
+        detail.append(brand);
+        const candidates = document.createElement("div");
+        candidates.className = "candidates";
+        if (item.candidates.length) {
+          candidates.textContent = `Possible matches: ${item.candidates.map((candidate) => `${candidate.label} (${candidate.code}, ${Math.round(candidate.score * 100)}%)`).join("; ")}`;
+          detail.append(candidates);
+        } else if (item.outcome === "REVIEW") {
+          candidates.textContent = "No matches above the display threshold.";
+          detail.append(candidates);
+        }
+        const status = document.createElement("span");
+        status.className = `status ${item.outcome.toLowerCase()}`;
+        status.textContent = item.outcome;
+        row.append(checkbox, detail, status);
+        rowsElement.append(row);
+      }
+      updateCount();
+      document.querySelector("#summary").textContent = `${visible.length} of ${items.length} names shown`;
+    }
+
+    async function load() {
+      const response = await fetch("/api/results", { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Could not load results.");
+      requestToken = data.requestToken;
+      items = data.items;
+      render();
+    }
+
+    selectAllButton.addEventListener("click", () => {
+      const visible = visibleItems();
+      const select = visible.some((item) => !item.selected);
+      const visibleIds = new Set(visible.map((item) => item.id));
+      items = items.map((item) => visibleIds.has(item.id) ? { ...item, selected: select } : item);
+      render();
+      notice.textContent = "";
+      notice.className = "";
+    });
+
+    for (const button of filterButtons) {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        render();
+      });
+    }
+
+    createButton.addEventListener("click", async () => {
+      createButton.disabled = true;
+      notice.className = "";
+      notice.textContent = "Creating CSV files...";
+      try {
+        const response = await fetch("/api/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requestToken, selectedIds: items.filter((item) => item.selected).map((item) => item.id) }),
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error(data.error || "Could not create output.");
+        notice.textContent = `Created ${data.brandsFile} and ${data.relationsFile} (${data.count} brands). Previous matching exports were replaced.`;
+      } catch (error) {
+        notice.className = "error";
+        notice.textContent = error instanceof Error ? error.message : String(error);
+      } finally {
+        createButton.disabled = false;
+      }
+    });
+
+    load().catch((error) => { notice.className = "error"; notice.textContent = error.message; });
+  </script>
+</body>
+</html>

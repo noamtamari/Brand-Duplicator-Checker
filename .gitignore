@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+npm-debug.log*
+results/
+.brand-index-cache-*.json
+brand-review-*.timing.json
+SP_brands_*.csv
+SP_brand_relations_*.csv
